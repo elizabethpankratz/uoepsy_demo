@@ -1,0 +1,5 @@
+---
+sidebar: false
+---
+
+[Access slides here](slides/demo.html).

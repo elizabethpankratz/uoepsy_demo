@@ -1,0 +1,21 @@
+---
+title: "TITLE"
+author: "Elizabeth Pankratz"
+institute: "Teaching presentation<br>Department of Psychology<br>The University of Edinburgh"
+output:
+  xaringan::moon_reader:
+    self_contained: true
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      ratio: '16:9'
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+One slide.
+
+---
+
+Another slide.
