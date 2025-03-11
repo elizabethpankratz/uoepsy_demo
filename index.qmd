@@ -2,4 +2,10 @@
 sidebar: false
 ---
 
-[Access slides here](slides/demo.html).
+[Teaching demo slides](slides/demo.html).
+
+TODO:
+
+- Describe dataset.
+- Supplementary analyses (plain old Gaussian; z-score by participant).
+

@@ -1,7 +1,7 @@
 ---
 title: "TITLE"
 author: "Elizabeth Pankratz"
-institute: "Teaching presentation<br>Department of Psychology<br>The University of Edinburgh"
+institute: "Department of Psychology<br>The University of Edinburgh"
 output:
   xaringan::moon_reader:
     self_contained: true
@@ -14,8 +14,58 @@ output:
       countIncrementalSlides: false
 ---
 
+```{r setup, include = FALSE}
+library(tidyverse)
+
+# To solve some conflicts between packages
+select <- dplyr::select
+
+# knitr settings
+knitr::opts_chunk$set(
+  fig.width=7, fig.height=5, fig.retina=3,
+  out.width = "60%", fig.align = "center",
+  cache = FALSE,
+  echo = FALSE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+knitr::opts_knit$set(root.dir = here::here())
+
+# dplyr and ggplot settings
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_bw())
+theme_update(
+  text = element_text(family = "Fira Sans", size=8),
+  axis.title.y = element_text(angle=0, vjust=0.5, hjust = 0),
+  panel.grid = element_blank(),
+  strip.background = element_blank()
+  )
+```
+
+## Hello world
+
 One slide.
+
+More text.
+
+Lorem ipsum.
+
+Dolor sit amet.
+
+I was wondering if there is a simple way to do the change of font size, colour and style (bold, italic, etc.) for particular words or phrases in individual xaringan slides within rmarkdown.
+I was wondering if there is a simple way to do the change of font size, colour and style (bold, italic, etc.) for particular words or phrases in individual xaringan slides within rmarkdown.
+I was wondering if there is a simple way to do the change of font size, colour and style (bold, italic, etc.) for particular words or phrases in individual xaringan slides within rmarkdown.
+I was wondering if there is a simple way to do the change of font size, colour and style (bold, italic, etc.) for particular words or phrases in individual xaringan slides within rmarkdown.
+
 
 ---
 
-Another slide.
+## Cars
+
+```{r}
+cars |>
+  ggplot(aes(x = speed, y = dist)) +
+  geom_point()
+```
+
