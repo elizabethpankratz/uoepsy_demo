@@ -2,10 +2,31 @@
 sidebar: false
 ---
 
-[Teaching demo slides](slides/demo.html).
+:::{.center-h}
+:::: {.columns}
 
-TODO:
+::: {.column width="20%"}
+<!-- [{{< iconify ri slideshow-line size=5x >}}<br><br>Teaching presentation](slides/demo.html) -->
+[{{< iconify mingcute presentation-1-line size=5x >}}<br><br>Teaching presentation](slides/demo.html)
+:::
 
-- Describe dataset.
-- Supplementary analyses (plain old Gaussian; z-score by participant).
+::: {.column width="20%"}
+[{{< iconify mingcute paper-2-line size=5x >}}<br><br>Teaching handout](slides/demo.html)
+:::
 
+::: {.column width="20%"}
+<!-- [{{< iconify mdi graph-box-multiple-outline size=5x >}}<br><br>Extra analyses](slides/demo.html) -->
+[{{< iconify mdi graph-bell-curve size=5x >}}<br><br>Extra analyses](slides/demo.html)
+:::
+
+::: {.column width="20%"}
+<!-- [{{< iconify ri survey-line size=5x >}}<br><br>About the data](slides/demo.html) -->
+[{{< iconify fluent likert-24-regular size=5x >}}<br><br>About the data](slides/demo.html)
+:::
+
+::: {.column width="20%"}
+[{{< iconify material-symbols book-5-outline-rounded size=5x >}}<br><br>Helpful resources](slides/demo.html)
+:::
+
+::::
+:::
