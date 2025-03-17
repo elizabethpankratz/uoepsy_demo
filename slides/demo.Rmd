@@ -6,8 +6,9 @@ output:
   xaringan::moon_reader:
     self_contained: true
     lib_dir: libs
-    css: xaringan-themer.css
+    css: [xaringan-themer.css, mytheme.css]
     nature:
+      beforeInit: "macros.js"
       ratio: '16:9'
       highlightStyle: github
       highlightLines: true
@@ -16,16 +17,19 @@ output:
 
 ```{r setup, include = FALSE}
 library(tidyverse)
+library(renderthis)
+library(MASS)
 
 # To solve some conflicts between packages
 select <- dplyr::select
 
 # knitr settings
 knitr::opts_chunk$set(
-  fig.width=7, fig.height=5, fig.retina=3,
-  out.width = "60%", fig.align = "center",
+  # fig.width=7, fig.height=5, out.width = "60%", 
+  fig.retina=3,
+  fig.align = "center",
   cache = FALSE,
-  echo = FALSE,
+  echo = TRUE,
   message = FALSE, 
   warning = FALSE,
   hiline = TRUE
@@ -40,36 +44,579 @@ theme_update(
   axis.title.y = element_text(angle=0, vjust=0.5, hjust = 0),
   panel.grid = element_blank(),
   strip.background = element_blank()
-  )
+)
+
+palette_gender <- c( '#882e72', '#1965b0', '#4eb265')
+palette_ab <- c('#72190e', '#F1932D')
 ```
 
-## Hello world
+class: middle
 
-One slide. $a^2 + b^2 = c^2.$
+## But first:
 
-More text.
 
-Lorem ipsum.
+[mentimeter link]
 
-Dolor sit amet.
-
-I was wondering if there is a simple way to do the change of font size, colour and style (bold, italic, etc.) for particular words or phrases in individual xaringan slides within rmarkdown.
-I was wondering if there is a simple way to do the change of font size, colour and style (bold, italic, etc.) for particular words or phrases in individual xaringan slides within rmarkdown.
-I was wondering if there is a simple way to do the change of font size, colour and style (bold, italic, etc.) for particular words or phrases in individual xaringan slides within rmarkdown.
-I was wondering if there is a simple way to do the change of font size, colour and style (bold, italic, etc.) for particular words or phrases in individual xaringan slides within rmarkdown.
+[mentimeter qr code]
 
 
 ---
 
-## Cars
+.pull-left[
+## The mistake
+]
+
+.pull-right[
+## How you'll avoid it
+]
+
+<!-- -- -->
+
+.pull-left[
+`r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
+**A common R programming mistake:**
+Letting R treat all variables that consist of numbers as numeric.
+]
+
+.pull-right[
+]
+
+<!-- -- -->
+
+.pull-left[
+`r fontawesome::fa("chart-simple", height = '1em', margin_right = '0.2em')` 
+**An advanced statistical mistake:**
+Modelling categorical, ordinal data as if it were numeric.
+]
+
+.pull-right[
+]
+
+<!-- -- -->
+
+.pull-left[
+`r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
+**A foundational statistical mistake:**
+Interpreting a significant *p*-value as proof that an effect exists.
+]
+
+.pull-right[
+]
+
+---
+class: inverse, middle, center
+
+`r fontawesome::fa("table", height = '5em')`
+
+# The data we'll use
+
+---
+
+## The SMARVUS dataset (Terry et al., 2023)
+
+.center[SMARVUS = **S**tatistics and **M**athematics **A**nxieties and **R**elated **V**ariables in **U**niversity **S**tudents]
+
+.pull-left[
+A survey of *n* = 18,841 students (mostly Psychology UGs) from 35 countries.
+
+Students rated their anxiety from 1 (no anxiety) to 5 (a great deal of anxiety) in scenarios like:
+
+- Studying for a statistics test.
+
+- Interpreting the meaning of a table in a journal article.
+
+- **Going to ask my statistics teacher for individual help with material I am having difficulty understanding.**
+]
+
+.pull-right[
+
+```{r read-in-anx, include=F}
+anx <- read_csv('data/anx.csv')
+anx <- select(anx, unique_id, gender, score) |> 
+  rename(rating = score) |>
+  mutate(gender = factor(gender, levels = c('Female/Woman', 'Male/Man', 'Another Gender')))
+```
+
+```{r bar-aggregated, echo=F, fig.width=7, fig.height=5.5}
+anx |>
+  ggplot(aes(x = factor(rating))) +
+  geom_bar(fill = '#2e3836') +
+  theme_classic() +
+  theme(text = element_text(family = "Fira Sans", size = 24)) +
+  labs(
+    x = element_blank(),
+    y = 'Count',
+    caption = 'n = 8,314'
+  ) +
+  scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\nof anxiety)')) +
+  NULL
+```
+
+]
+
+---
+
+## Why Likert scale ratings are not numeric
+
+.center[
+![:scale 70%](imgs/rating-scale.png)
+]
+
+---
+
+## And yet...
+
+.center[
+![:scale 50%](imgs/ReederEtAl2017-JML.png)
+]
+
+Figure 2 from Reeder et al. (2017), published in Journal of Memory and Language!
+
+---
+
+## By default, R will keep numeric-looking variables numeric
+
+If we allow R's default behaviour, then we can do naughty things with categorical variables:
 
 ```{r}
-cars |>
-  ggplot(aes(x = speed, y = dist)) +
-  geom_point()
+mean(anx$rating)
+```
+
+But if we store these variables as factors, the naughty things become impossible (yay!):
+
+```{r}
+anx <- anx |>
+  mutate(rating = factor(rating))
+
+mean(anx$rating)
 ```
 
 ---
 
+# LOs
 
+---
+class: inverse, middle, center
+
+`r fontawesome::fa("magnifying-glass-chart", height = '5em')`
+
+# Modelling an ordinal variable
+
+### The .mono-white[polr()] express
+
+---
+
+## Fit an ordinal regression model
+
+```{r anx_fit1, message=F}
+library(MASS)        # MASS contains the polr() function
+                     # (polr = Proportional Odds Logistic Regression)
+
+anx_fit1 <- polr(
+  rating ~ 1,        # intercept-only model, to start
+  data = anx, 
+  Hess = TRUE,       # required if we want to use summary()
+  method = 'probit'  # more on this in a moment
+)
+```
+
+---
+
+## Fit an ordinal regression model
+
+```{r anx_fit1-summary, message=F}
+summary(anx_fit1)
+```
+
+---
+
+## What do those `Intercepts` mean?
+
+```{r echo=F}
+get_probs_btwn_thresholds <- function(zetas){
+  # zetas: a vector of thresholds (numeric) in Phi space (estimated by polr model).
+  
+  # Back-transform thresholds into probability space. Currently cumulative.
+  prob_spc_thresholds <- pnorm(zetas)  
+  
+  # Add first and last elements to this cumsum so that successive differences come out right.
+  probs_btwn_thresholds <- diff( c(`1` = 0, prob_spc_thresholds, 'x' = 1) )
+  
+  # Rename each element in the vector to the between-threshold sections.
+  names(probs_btwn_thresholds) <- 1:length(probs_btwn_thresholds)
+  
+  return(probs_btwn_thresholds)
+}
+```
+
+
+```{r plot-underlying-normal, echo = F, fig.width = 12, fig.height = 6}
+prob_labs <- tibble(
+  x = c(-3, -1.4, -0.5, 0.1, 0.7, 1.5),
+  d = c(0.05),
+  labs = c('Prob:', round(get_probs_btwn_thresholds(anx_fit1$zeta), 2))
+)
+
+rating_labs <- tibble(
+  x = c(-2.6, -1.4, -0.5, 0.1, 0.7, 1.5),
+  d = c(0.3),
+  labs = c('Rating:', 1:5)
+)
+
+
+tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0.4) +
+  geom_vline(xintercept = anx_fit1$zeta, linetype = 'dotted') +  # thresholds
+  geom_text(data = prob_labs, aes(label = labs), family = "Fira Sans", size = 6) +
+  geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 12) +
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)',
+    breaks = -3:3,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit1$zeta %>% as.double(),
+      labels = round(anx_fit1$zeta, 2)
+    )) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  coord_cartesian(xlim = c(-3, 3)) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+    axis.line.x.top = element_blank(),
+    axis.text.x.top = element_text(size=20)
+  ) +
+  NULL
+```
+
+???
+
+- imagine that there's some underlying continuous normal distribution of anxiety, assumed standard normal [show normal distrib]
+- ppl with high anxiety are more likely to give high responses, ppl with low anxiety more likely to give low responses (could do emojis relating to anxiety: `r fontawesome::fa("face-smile-beam", height = '1em')`, `r fontawesome::fa("face-grimace", height = '1em')`)
+- so to estimate how different anxiety levels translate to different responses on the 1--5 scale, we draw thresholds on that distribution [add thresholds]
+- ppl with anxiety in this bin will respond with 1, in this bin with 2, etc.
+- and those thresholds, the cutpoints btwn ratings, are the intercepts.
+- [show intercept estimates, put thoes same numbers on the thresholds]
+- normal distribution assumption is from method = probit. other methods assume other underlying distributions, but the idea of thresholds is the same.
+
+---
+class: inverse, middle, center
+
+`r fontawesome::fa("mars-and-venus-burst", height = '5em')`
+
+# "Preregistration" activity
+
+### The effect of gender on stats anxiety
+
+---
+
+#### How will a student's gender affect ratings for "Going to ask my statistics teacher for individual help with material I am having difficulty understanding"?
+
+```{r plot-gender-bars, echo = FALSE, fig.width=11, fig.height=7}
+anx %>%
+  ggplot(aes(x = rating, fill = gender)) +
+  geom_bar() +
+  facet_wrap(~ gender, scales = 'free', nrow=3) +
+  scale_fill_manual(values = palette_gender) +
+  theme_classic() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        text = element_text(family = 'Fira Sans', size = 24)) +
+  labs(
+    x = element_blank(),
+    y = 'Count'
+  ) +
+  scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\nof anxiety)')) +
+  NULL
+```
+
+---
+
+Activity is part of the handout.
+
+
+`r fontawesome::fa("hourglass-start", margin_right = '0.2em', height = '1em')` **For one minute:** Think/write some predictions to yourself.
+
+`r fontawesome::fa("hourglass-half", margin_right = '0.2em', height = '1em')` **For one minute:** Ask your neighbour what they predicted. What was their reasoning? What was yours?
+
+`r fontawesome::fa("hourglass-end", margin_right = '0.2em', height = '1em')` **Afterward we'll look at the model's estimates together.**
+]
+
+???
+
+The puzzle pieces:
+
+- The threshold values will stay in the same place.
+- If you move the normal distribution left, then more probability density will end up toward the lower end of the scale (less anxiety). If you move the distribution right, more probability density will be toward the higher end of the scale (more anxiety).
+- Each gender gets one probability distribution over anxiety values.
+- Here's the one for Female/Woman.
+- I want you to "preregister" a guess, before we look at the outcome of the model, whether the distribution for the Male/Men group will be shifted left or right from the Female one, and whether the distribution for the Another Gender group will be shifted left or right from the female one. Based on this data.
+- Draw it on the plot on the handout, if you want.
+
+---
+
+```{r anx_fit2-fit-manip, echo = F}
+anx_fit2 <- polr(
+  rating ~ gender,
+  data = anx,
+  method = 'probit',
+  Hess = TRUE
+)
+
+anx_fit2_latent_normals <- tibble(
+  Gender = factor(c('Female/Woman', 'Male/Man', 'Another Gender'), levels = c('Female/Woman', 'Male/Man', 'Another Gender')),
+  mu     = c(0, coef(anx_fit2))
+) |>
+  tidyr::expand(
+    nesting(Gender, mu),
+    x = seq(from = -4, to = 4, length.out = 200)
+  ) |>
+  mutate(
+    d = dnorm(x, mean = mu, sd = 1)  # get dens at each x value for normal distrib with each row's mu
+  )
+
+get_thresholds_anx_fit2 <- function(levelname){
+  # levelname: string, one of 'Female/Woman', 'Male/Man', 'Another Gender'
+  
+  eta_male <- anx_fit2$coefficients[['genderMale/Man']] 
+  eta_anot <- anx_fit2$coefficients[['genderAnother Gender']] 
+  x_male <- contrasts(anx$gender)[levelname,][['Male/Man']]
+  x_anot <- contrasts(anx$gender)[levelname,][['Another Gender']]
+  
+  # no link function, but computing the position on the Phi scale of each threshold using the following specifications:
+  # linkfn(Phat(Y <= 1)) = –0.90 – (–0.33 * `Male/Man`) – (0.48 * `Another Gender`)
+  phi_12 <- anx_fit2$zeta[['1|2']] - (eta_male * x_male) - (eta_anot * x_anot)
+  
+  # linkfn(Phat(Y <= 2)) = –0.22 – (–0.33 * `Male/Man`) – (0.48 * `Another Gender`)
+  phi_23 <- anx_fit2$zeta[['2|3']] - (eta_male * x_male) - (eta_anot * x_anot)
+  
+  # linkfn(Phat(Y <= 3)) =  0.33 – (–0.33 * `Male/Man`) – (0.48 * `Another Gender`)
+  phi_34 <- anx_fit2$zeta[['3|4']] - (eta_male * x_male) - (eta_anot * x_anot)
+  
+  # linkfn(Phat(Y <= 4)) =  0.99 – (–0.33 * `Male/Man`) – (0.48 * `Another Gender`)
+  phi_45 <- anx_fit2$zeta[['4|5']] - (eta_male * x_male) - (eta_anot * x_anot)
+  
+  return( c('1|2' = phi_12, '2|3' = phi_23, '3|4' = phi_34, '4|5' = phi_45) )
+}
+
+fem_probs <- get_probs_btwn_thresholds( get_thresholds_anx_fit2('Female/Woman') )
+```
+
+## How does gender affect anxiety ratings?
+
+.center[
+```{r all-gender-normals, echo=F, fig.width = 12, fig.height = 6}
+anx_fit2_latent_normals |>
+  # filter(Gender == 'Female/Woman') |>
+  # filter(Gender %in% c('Female/Woman', 'Male/Man')) |>
+  ggplot(aes(x = x, y = d, fill = Gender)) +
+  geom_area(position = 'identity', alpha = 0.5) +
+  geom_vline(xintercept = anx_fit2$zeta, linetype = 'dotted') +
+  scale_fill_manual(values = palette_gender) +
+  theme_classic() +
+  theme(
+    axis.line.x.top = element_blank(),
+    text = element_text(family = 'Fira Sans', size = 24)
+  ) +
+  scale_y_continuous(NULL, breaks = NULL, limits = c(0, 0.5)) +
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)', 
+    breaks = -3:3,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit2$zeta %>% as.double(),
+      labels = round(anx_fit2$zeta, 2)
+    )) +
+  geom_segment(aes(x= 0, y = 0.42, xend = anx_fit2$coefficients[['genderMale/Man']], yend = 0.42), linewidth = 1, arrow = arrow(length = unit(0.2,"cm")), colour = palette_gender[2]) +
+  geom_label(aes(x = -0.15, y = 0.44), label = round(anx_fit2$coefficients[['genderMale/Man']], 2), fill = 'white', colour = palette_gender[2], family = 'Fira Sans', size = 6) +
+  geom_segment(aes(x= 0, y = 0.46, xend = anx_fit2$coefficients[['genderAnother Gender']], yend = 0.46), linewidth = 1, arrow = arrow(length = unit(0.2,"cm")), colour = palette_gender[3]) +
+  geom_label(aes(x = 0.2, y = 0.48), label = round(anx_fit2$coefficients[['genderAnother Gender']], 2), fill = 'white', colour = palette_gender[3], family = 'Fira Sans', size = 6) +
+  NULL
+```
+]
+
+
+---
+
+
+```{r anx_fit2-display}
+anx_fit2 <- polr(
+  rating ~ gender,
+  data = anx,
+  method = 'probit',
+  Hess = TRUE
+)
+summary(anx_fit2)
+```
+
+---
+
+# LOs
+
+---
+class: inverse, middle, center
+
+`r fontawesome::fa("asterisk", height = '5em')`
+
+# Interpreting *p*-values
+
+---
+
+## Are the effects of `gender` significant?
+
+```
+Coefficients:
+                       Value Std. Error t value
+genderMale/Man       -0.3280    0.03015 -10.880
+genderAnother Gender  0.4846    0.11992   4.041
+```
+
+No *p*-values in the model summary.
+But it's common practice to compare `t value` to a standard normal distribution (treating them like *z* scores).
+
+```{r anx_fit2-coef-pvals}
+pnorm(abs(-10.880), lower.tail = FALSE) * 2
+pnorm(abs(  4.041), lower.tail = FALSE) * 2
+```
+
+Since both *p*-values are below 0.05:
+
+- we CAN reject the null hypothesis that gender has no effect on ratings.
+- we CANNOT conclude that there really is an effect of gender.
+
+
+---
+
+#### Why doesn't a significant *p*-value mean that there really is an effect?
+
+Because we can also get significant *p*-values when there really is *no* effect.
+
+.pull-left[
+No difference in reality:
+
+```{r true-skew-probdist, echo=F, fig.height = 5.5}
+TRUE_PROBDIST <- c(.4, .25, .15, .1, .1)
+  
+tibble(
+  group = rep(c('Group A', 'Group B'), each = 5),
+  score = rep(1:5, 2),
+  prob = rep(TRUE_PROBDIST, 2)  # skewed
+) |>
+  ggplot(aes(x = factor(score), y = prob, fill = group)) +
+  geom_bar(stat = 'identity') +
+  theme_classic() +
+  facet_wrap(~ group, nrow = 2) +
+  theme(
+    legend.position = 'none',
+    text = element_text(family = 'Fira Sans', size = 24),
+    strip.background = element_blank()
+  ) +
+  labs(
+    x = element_blank(),
+    y = 'True probability of each rating'
+  ) +
+  scale_y_continuous(
+    limits = c(0, 1),
+    breaks = c(0, 0.5, 1)
+  ) +
+  scale_fill_manual(values = palette_ab) +
+  scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\n of anxiety)')) +
+  NULL
+```
+]
+
+.pull-right[
+A possible random sample (*n* = 50 per group):
+
+```{r simdat, echo=F, fig.height = 5.5}
+SAMPLE_SIZE <- 50
+set.seed(1)
+sample_a <- sample(x = 1:5, size = SAMPLE_SIZE, replace = TRUE, prob = TRUE_PROBDIST)
+
+set.seed(24)
+sample_b <- sample(x = 1:5, size = SAMPLE_SIZE, replace = TRUE, prob = TRUE_PROBDIST)
+  
+simdat <- tibble(
+  group = rep(c('Group A', 'Group B'), each = SAMPLE_SIZE),
+  rating = factor(c(sample_a, sample_b))
+)
+
+simdat |> 
+  ggplot(aes(x = rating, fill = group)) +
+  geom_bar() +
+  facet_wrap(~ group, nrow = 2) +
+  theme_classic() +
+  theme(
+    legend.position = 'none',
+    text = element_text(family = 'Fira Sans', size = 24),
+    strip.background = element_blank()
+  ) +
+  scale_fill_manual(values = palette_ab) +
+  labs(
+    y = 'Count',
+    x = element_blank(),
+    ) +
+  scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\n of anxiety)')) +
+  NULL
+```
+
+]
+
+---
+
+```{r}
+sim_fit <- polr(rating ~ group, data = simdat, method = 'probit', Hess = TRUE)
+summary(sim_fit)  
+```
+
+```{r}
+pnorm(abs(-2.009), lower.tail = FALSE) * 2
+```
+
+
+
+---
+
+.pull-left[
+## The mistake
+]
+.pull-right[
+## How you'll avoid it
+]
+<!--  -->
+.pull-left[
+`r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
+**A common R programming mistake:**
+Letting R treat all variables that consist of numbers as numeric.
+]
+.pull-right[
+When you know a variable is categorical, tell R that using `factor()`.
+]
+<!--  -->
+.pull-left[
+`r fontawesome::fa("chart-simple", height = '1em', margin_right = '0.2em')` 
+**An advanced statistical mistake:**
+Modelling categorical, ordinal data as if it were numeric.
+]
+.pull-right[
+Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`).
+]
+<!--  -->
+.pull-left[
+`r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
+**A foundational statistical mistake:**
+Interpreting a significant *p*-value as proof that an effect exists.
+]
+.pull-right[
+Understand that significant *p*-values can arise even if no effect exists.
+]
+
+---
+
+## TODO References
+
+Reeder et al. 2017
+
+Terry et al. 2023
 
