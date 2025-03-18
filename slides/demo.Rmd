@@ -124,7 +124,7 @@ Students rated their anxiety from 1 (no anxiety) to 5 (a great deal of anxiety) 
 
 - Interpreting the meaning of a table in a journal article.
 
-- **Going to ask my statistics teacher for individual help with material I am having difficulty understanding.** →
+- **Going to ask my statistics teacher for individual help with material I am having difficulty understanding. → ** 
 ]
 
 --
@@ -157,7 +157,7 @@ anx |>
 
 ---
 
-## Why Likert scale ratings are not numeric
+## Why Likert scale ratings are not continuous numeric
 
 .center[
 ![:scale 80%](imgs/rating-scale-0.png)
@@ -166,7 +166,7 @@ anx |>
 ---
 count:false
 
-## Why Likert scale ratings are not numeric
+## Why Likert scale ratings are not continuous numeric
 
 .center[
 ![:scale 80%](imgs/rating-scale-1.png)
@@ -175,7 +175,7 @@ count:false
 ---
 count:false
 
-## Why Likert scale ratings are not numeric
+## Why Likert scale ratings are not continuous numeric
 
 .center[
 ![:scale 80%](imgs/rating-scale-2.png)
@@ -184,7 +184,7 @@ count:false
 ---
 count:false
 
-## Why Likert scale ratings are not numeric
+## Why Likert scale ratings are not continuous numeric
 
 .center[
 ![:scale 80%](imgs/rating-scale-3.png)
@@ -199,7 +199,7 @@ count:false
 .pull-left[
 ![](imgs/ReederEtAl2017-JML.png)
 
-Reeder et al. (2017) in Journal of Memory and Language.
+Reeder et al. (2017) in **Journal of Memory and Language.**
 
 ]
 
@@ -208,22 +208,34 @@ Reeder et al. (2017) in Journal of Memory and Language.
 ![](imgs/ElazarEtAl2022-CogSci2.png)
 
 
-Elazar et al. (2022) in Cognitive Science.
+Elazar et al. (2022) in **Cognitive Science.**
 
 <br>
 
 ![](imgs/HarriganEtAl2022-Language.png)
 
-Harrigan et al. (2022) in Language.
+Harrigan et al. (2022) in **Language.**
 
 ]
 
 
 ---
 
-## By default, R will keep numeric-looking data numeric
+## R will keep numeric-looking data numeric
 
 --
+
+.pull-left[
+
+```{r}
+head(anx, 3)
+```
+
+]
+
+--
+
+.pull-right[
 
 If we allow R's default behaviour, then we can do naughty things with categorical variables:
 
@@ -231,13 +243,14 @@ If we allow R's default behaviour, then we can do naughty things with categorica
 mean(anx$rating)
 ```
 
+]
+
 --
 
-But if we store these variables as factors, the naughty things become impossible (yay!):
+But if we **store these variables as factors,** the naughty things become impossible (yay!):
 
 ```{r}
-anx <- anx |>
-  mutate(rating = factor(rating))
+anx <- anx |> mutate(rating = factor(rating))
 
 mean(anx$rating)
 ```
@@ -353,8 +366,6 @@ anx_fit1 <- polr(
 
 ##  Model ordinal data with `polr()`
 
---
-
 ```{r anx_fit1-summary, message=F}
 summary(anx_fit1)
 ```
@@ -392,17 +403,16 @@ get_probs_btwn_thresholds <- function(zetas){
 
 rating_labs <- tibble(
   x = c(-2.6, -1.4, -0.5, 0.1, 0.7, 1.5),
-  d = c(0.3),
+  d = c(0.45),
   labs = c('Rating:', 1:5)
 )
 
-tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) %>% 
+p_underlying_normal <- tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) %>% 
   mutate(d = dnorm(x = x)) %>% 
   ggplot(aes(x = x, y = d)) +
   geom_area(fill = '#2e3836', alpha = 0.4) +
-  geom_vline(xintercept = anx_fit1$zeta, linetype = 'dotted', linewidth = 2) +  # thresholds
-  # geom_text(data = prob_labs, aes(label = labs), family = "Fira Sans", size = 6) +
-  geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 12) +
+  # geom_vline(xintercept = anx_fit1$zeta, linetype = 'dotted', linewidth = 2) +  # thresholds
+  # geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 12) +
   scale_x_continuous(
     'Anxiety (imaginary underlying variable)',
     breaks = -3:3,
@@ -410,17 +420,24 @@ tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) %>%
       name = NULL,
       breaks = anx_fit1$zeta %>% as.double(),
       labels = round(anx_fit1$zeta, 2)
-    )) +
-  scale_y_continuous(NULL, breaks = NULL) +
+    )
+    ) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.5)
+    ) +
   coord_cartesian(xlim = c(-3, 3)) +
   theme_classic() +
   theme( 
     text = element_text(family = "Fira Sans", size = 24),
     axis.line.x.top = element_blank(),
     axis.ticks.x.top = element_blank(),
-    axis.text.x.top = element_text(size=28)
+    axis.text.x.top = element_text(size=28, colour = 'white')
   ) +
   NULL
+
+p_underlying_normal
 ```
 
 ???
@@ -434,13 +451,56 @@ tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) %>%
 - normal distribution assumption is from method = probit. other methods assume other underlying distributions, but the idea of thresholds is the same.
 
 ---
+count: false
+
+## What do those `Intercepts` mean?
+
+```{r plot-underlying-normal2, message=F, echo = F, fig.width = 12, fig.height = 6}
+p_underlying_normal +
+  geom_vline(xintercept = anx_fit1$zeta, linetype = 'dotted', linewidth = 1) +  # thresholds
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)',
+    breaks = -3:3,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit1$zeta %>% as.double(),
+      labels = round(anx_fit1$zeta, 2)
+    )
+  ) +
+  geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 12) +
+  theme(axis.text.x.top = element_text(size=28, colour = 'white')) +
+  NULL
+```
+
+---
+count: false
+
+## What do those `Intercepts` mean?
+
+```{r plot-underlying-normal3, message=F, echo = F, fig.width = 12, fig.height = 6}
+p_underlying_normal +
+  geom_vline(xintercept = anx_fit1$zeta, linetype = 'dotted', linewidth = 1) +  # thresholds
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)',
+    breaks = -3:3,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit1$zeta %>% as.double(),
+      labels = round(anx_fit1$zeta, 2)
+    )
+  ) +
+  geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 12) +
+  theme(axis.text.x.top = element_text(size=28, colour = 'black')) +
+  NULL
+```
+
+
+---
 class: inverse, middle, center
 
 `r fontawesome::fa("mars-and-venus-burst", height = '5em')`
 
-# Prediction activity
-
-### Associations between gender and stats anxiety
+# Stats anxiety and gender
 
 ---
 
@@ -475,11 +535,11 @@ anx %>%
 
 <br> <br>
 
-`r fontawesome::fa("hourglass-start", margin_right = '0.2em', height = '1em')` **For one minute:** Think to yourself about the questions.
+`r fontawesome::fa("hourglass-start", margin_right = '0.2em', height = '1em')` **First:** Think to yourself about the questions.
 
-`r fontawesome::fa("hourglass-half", margin_right = '0.2em', height = '1em')` **For one minute:** Ask your neighbour what they think. What's their reasoning? What's yours?
+`r fontawesome::fa("hourglass-half", margin_right = '0.2em', height = '1em')` **Then:** Ask your neighbour what they think. What's their reasoning? What's yours?
 
-`r fontawesome::fa("hourglass-end", margin_right = '0.2em', height = '1em')` **Afterward** we'll look at the model's estimates together and discuss.
+`r fontawesome::fa("hourglass-end", margin_right = '0.2em', height = '1em')` **Afterward:** we'll look at the model's estimates together and discuss.
 
 ]
 
@@ -569,35 +629,31 @@ anx_fit2_latent_normals |>
 ```
 
 
-```{r all-gender-normals, echo=F, fig.width = 13, fig.height = 8}
-mm_mean <- anx_fit2$coefficients[['genderMale/Man']]
-ag_mean <- anx_fit2$coefficients[['genderAnother Gender']]
-
+```{r fem-normal, echo=F, fig.width = 13, fig.height = 8}
 rating_labs <- tibble(
-  x = c(-2.6, -1.4, -0.5, 0.1, 0.7, 1.5),
-  d = c(0.3),
+  x = c(-2.6, -1.4, -0.6, 0.1, 0.7, 1.5),
+  d = c(0.57),
   labs = c('Rating:', 1:5),
   Gender = c('Female/Woman')
 )
 
-anx_fit2_latent_normals |>
-  # filter(Gender == 'Female/Woman') |>
-  # filter(Gender %in% c('Female/Woman', 'Male/Man')) |>
+p_fem_normal <- anx_fit2_latent_normals |>
+  filter(Gender == 'Female/Woman') |>
   ggplot(aes(x = x, y = d, fill = Gender)) +
   geom_area(position = 'identity', alpha = 0.5) +
-  geom_vline(xintercept = anx_fit2$zeta, linetype = 'dotted', linewidth = 2) +
-  geom_vline(xintercept = 0, colour = palette_gender[1]) +
-  geom_vline(xintercept = mm_mean, colour = palette_gender[2]) +
-  geom_vline(xintercept = ag_mean, colour = palette_gender[3]) +
+  geom_vline(xintercept = anx_fit2$zeta, linetype = 'dotted', linewidth = 1) +
+  geom_vline(xintercept = 0, colour = palette_gender[1], linewidth = 1.5) +
   geom_text(data = rating_labs, aes(label = labs), family = 'Fira Sans', size = 12) +
   scale_fill_manual(values = palette_gender) +
   theme_classic() +
   theme(
     axis.line.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
     text = element_text(family = 'Fira Sans', size = 24),
-    axis.text.x.top = element_text(family = 'Fira Sans', size = 24)
+    axis.text.x.top = element_text(family = 'Fira Sans', size = 24, colour = 'black'),
+    legend.position = 'bottom'
   ) +
-  scale_y_continuous(NULL, breaks = NULL, limits = c(0, 0.5)) +
+  scale_y_continuous(NULL, breaks = NULL, limits = c(0, 0.6)) +
   scale_x_continuous(
     'Anxiety (imaginary underlying variable)', 
     breaks = -3:3,
@@ -606,14 +662,88 @@ anx_fit2_latent_normals |>
       breaks = anx_fit2$zeta %>% as.double(),
       labels = round(anx_fit2$zeta, 2)
     )) +
-  geom_segment(aes(x= 0, y = 0.42, xend = mm_mean, yend = 0.42), linewidth = 1, arrow = arrow(length = unit(0.2,"cm")), colour = palette_gender[2]) +
-  geom_label(aes(x = -0.15, y = 0.44), label = round(mm_mean, 2), fill = 'white', colour = palette_gender[2], family = 'Fira Sans', size = 6) +
-  geom_segment(aes(x= 0, y = 0.46, xend = ag_mean, yend = 0.46), linewidth = 1, arrow = arrow(length = unit(0.2,"cm")), colour = palette_gender[3]) +
-  geom_label(aes(x = 0.2, y = 0.48), label = round(ag_mean, 2), fill = 'white', colour = palette_gender[3], family = 'Fira Sans', size = 6) +
   NULL
+
+p_fem_normal
 ```
 ]
 
+---
+count: false
+
+```{r fem-mal-normals, echo=F, fig.width = 13, fig.height = 8}
+mm_mean <- anx_fit2$coefficients[['genderMale/Man']]
+
+anx_fit2_latent_normals |>
+  filter(Gender %in% c('Female/Woman', 'Male/Man')) |>
+  ggplot(aes(x = x, y = d, fill = Gender)) +
+  geom_area(position = 'identity', alpha = 0.5) +
+  geom_vline(xintercept = anx_fit2$zeta, linetype = 'dotted', linewidth = 1) +
+  geom_vline(linewidth = 1.5, xintercept = 0, colour = palette_gender[1]) +
+  geom_vline(linewidth = 1.5, xintercept = mm_mean, colour = palette_gender[2]) +
+  geom_text(data = rating_labs, aes(label = labs), family = 'Fira Sans', size = 12) +
+  scale_fill_manual(values = palette_gender) +
+  theme_classic() +
+  theme(
+    axis.line.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    text = element_text(family = 'Fira Sans', size = 24),
+    axis.text.x.top = element_text(family = 'Fira Sans', size = 24, colour = 'black'),
+    legend.position = 'bottom'
+  ) +
+  scale_y_continuous(NULL, breaks = NULL, limits = c(0, 0.6)) +
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)', 
+    breaks = -3:3,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit2$zeta %>% as.double(),
+      labels = round(anx_fit2$zeta, 2)
+    )) +
+  geom_segment(aes(x= 0, y = 0.44, xend = mm_mean, yend = 0.44), linewidth = 2, arrow = arrow(length = unit(0.5,"cm")), colour = palette_gender[2]) +
+  geom_label(aes(x = -0.33, y = 0.49), label = round(mm_mean, 2), fill = 'white', colour = palette_gender[2], family = 'Fira Sans', size = 10) +
+  NULL
+```
+
+
+---
+count: false
+
+```{r all-gender-normals, echo=F, fig.width = 13, fig.height = 8}
+ag_mean <- anx_fit2$coefficients[['genderAnother Gender']]
+
+anx_fit2_latent_normals |>
+  ggplot(aes(x = x, y = d, fill = Gender)) +
+  geom_area(position = 'identity', alpha = 0.5) +
+  geom_vline(xintercept = anx_fit2$zeta, linetype = 'dotted', linewidth = 1) +
+  geom_vline(linewidth = 1.5, xintercept = 0, colour = palette_gender[1]) +
+  geom_vline(linewidth = 1.5, xintercept = mm_mean, colour = palette_gender[2]) +
+  geom_vline(linewidth = 1.5, xintercept = ag_mean, colour = palette_gender[3]) +
+  geom_text(data = rating_labs, aes(label = labs), family = 'Fira Sans', size = 12) +
+  scale_fill_manual(values = palette_gender) +
+  theme_classic() +
+  theme(
+    axis.line.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    text = element_text(family = 'Fira Sans', size = 24),
+    axis.text.x.top = element_text(family = 'Fira Sans', size = 24, colour = 'black'),
+    legend.position = 'bottom'
+  ) +
+  scale_y_continuous(NULL, breaks = NULL, limits = c(0, 0.6)) +
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)', 
+    breaks = -3:3,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit2$zeta %>% as.double(),
+      labels = round(anx_fit2$zeta, 2)
+    )) +
+  geom_segment(aes(x= 0, y = 0.44, xend = mm_mean, yend = 0.44), linewidth = 2, arrow = arrow(length = unit(0.5,"cm")), colour = palette_gender[2]) +
+  geom_label(aes(x = -0.33, y = 0.49), label = round(mm_mean, 2), fill = 'white', colour = palette_gender[2], family = 'Fira Sans', size = 10) +
+  geom_segment(aes(x= 0, y = 0.44, xend = ag_mean, yend = 0.44), linewidth = 2, arrow = arrow(length = unit(0.5,"cm")), colour = palette_gender[3]) +
+  geom_label(aes(x = 0.48, y = 0.49), label = round(ag_mean, 2), fill = 'white', colour = palette_gender[3], family = 'Fira Sans', size = 10) +
+  NULL
+```
 
 ---
 
@@ -748,7 +878,9 @@ No *p*-values in the model summary.
 
 --
 
-But it's common practice to compare these *t*-values to a standard normal distribution (treating them like *z* scores).
+But it's common practice to compare these *t*-values to a standard normal distribution.
+
+--
 
 ```{r anx_fit2-coef-pvals1, echo=T}
 pnorm(abs(-10.880), lower.tail = FALSE) * 2
@@ -771,7 +903,7 @@ Because we can also get significant *p*-values when there really is *no* effect.
 --
 
 .pull-left[
-No difference in reality:
+No difference in the true population:
 
 ```{r true-skew-probdist, echo=F, fig.height = 5}
 TRUE_PROBDIST <- c(.4, .25, .15, .1, .1)
@@ -803,6 +935,8 @@ tibble(
   NULL
 ```
 ]
+
+--
 
 .pull-right[
 A possible random sample (*n* = 50 per group):
@@ -845,8 +979,6 @@ simdat |>
 
 ### Why don't significant *p*-values mean an effect exists?
 
---
-
 ```{r eval = FALSE}
 sim_fit <- polr(rating ~ group, data = simdat, method = 'probit', Hess = TRUE)
 summary(sim_fit)  
@@ -857,6 +989,9 @@ summary(sim_fit)
 ##                Value Std. Error t value
 ## groupGroup B -0.4479     0.2229  -2.009
 ```
+
+<br>
+
 --
 
 ```{r}
