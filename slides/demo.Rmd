@@ -50,13 +50,38 @@ palette_gender <- c( '#882e72', '#1965b0', '#4eb265')
 palette_ab <- c('#72190e', '#F1932D')
 ```
 
-<!-- ## But first: -->
 
-<!-- Go to `menti.com` and enter code `3459 5977`. -->
 
-<!-- Or scan QR code: -->
+## Something you won't be able to unsee
 
-<!-- ![:scale 30%](imgs/DEMO-qr.png) -->
+--
+
+.pull-left[
+![](imgs/ReederEtAl2017-JML.png)
+
+Reeder et al. (2017) in **Journal of Memory and Language.**
+
+]
+
+.pull-right[
+
+![](imgs/ElazarEtAl2022-CogSci2.png)
+
+
+Elazar et al. (2022) in **Cognitive Science.**
+
+<br>
+
+![](imgs/HarriganEtAl2022-Language.png)
+
+Harrigan et al. (2022) in **Language.**
+
+]
+
+
+
+---
+
 
 
 .pull-left[
@@ -71,8 +96,8 @@ palette_ab <- c('#72190e', '#F1932D')
 
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
-**A common R programming mistake:**
-Letting R treat all variables that consist of numbers as numeric.
+**A common R mistake:**
+Letting R treat all variables that consist of numbers as continuous numeric.
 ]
 
 .pull-right[
@@ -82,7 +107,7 @@ Letting R treat all variables that consist of numbers as numeric.
 
 .pull-left[
 `r fontawesome::fa("chart-simple", height = '1em', margin_right = '0.2em')` 
-**An advanced statistical mistake:**
+**An advanced stats mistake:**
 Modelling categorical, ordinal data as if it were numeric.
 ]
 
@@ -93,52 +118,27 @@ Modelling categorical, ordinal data as if it were numeric.
 
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
-**A foundational statistical mistake:**
-Interpreting a significant *p*-value as evidence that an effect exists.
+**A foundational stats mistake:**
+Interpreting a significant *p*-value as evidence that an effect exists in the real world.
 ]
 
 .pull-right[
 ]
 
----
-class: inverse, middle, center
-
-`r fontawesome::fa("table", height = '5em')`
-
-# The data we'll use
 
 ---
 
-## The SMARVUS dataset (Terry et al., 2023)
-
-.center[SMARVUS = **S**tatistics and **M**athematics **A**nxieties and **R**elated **V**ariables in **U**niversity **S**tudents]
+### The data: Students' anxiety ratings for "Going to ask my statistics teacher for individual help with material I am having difficulty understanding."
 
 --
-
-.pull-left[
-A survey of *n* = 18,841 students (mostly Psychology UGs) from 35 countries.
-
-Students rated their anxiety from 1 (no anxiety) to 5 (a great deal of anxiety) in scenarios like:
-
-- Studying for a statistics test.
-
-- Interpreting the meaning of a table in a journal article.
-
-- **Going to ask my statistics teacher for individual help with material I am having difficulty understanding. → ** 
-]
-
---
-
-.pull-right[
 
 ```{r read-in-anx, include=F}
 anx <- read_csv('data/anx.csv')
 anx <- select(anx, unique_id, gender, score) |> 
-  rename(rating = score) |>
-  mutate(gender = factor(gender, levels = c('Female/Woman', 'Male/Man', 'Another Gender')))
+  rename(rating = score)
 ```
 
-```{r bar-aggregated, echo=F, fig.width=7, fig.height=5.5}
+```{r bar-aggregated, echo=F, fig.width=8, fig.height=5.5}
 anx |>
   ggplot(aes(x = factor(rating))) +
   geom_bar(fill = '#2e3836') +
@@ -151,6 +151,33 @@ anx |>
   ) +
   scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\nof anxiety)')) +
   NULL
+```
+
+]
+
+---
+
+### The data: Students' anxiety ratings for "Going to ask my statistics teacher for individual help with material I am having difficulty understanding."
+
+
+.pull-left[
+
+```{r}
+slice(anx, 45:50)
+```
+
+]
+
+--
+
+.pull-right[
+
+`rating` looks like numbers, and R treats it like numbers.
+
+And we can manipulate it like numbers.
+
+```{r}
+mean(anx$rating)
 ```
 
 ]
@@ -192,66 +219,20 @@ count:false
 
 ---
 
-## And yet...
+## Remember: We are smarter than R is
 
---
-
-.pull-left[
-![](imgs/ReederEtAl2017-JML.png)
-
-Reeder et al. (2017) in **Journal of Memory and Language.**
-
-]
-
-.pull-right[
-
-![](imgs/ElazarEtAl2022-CogSci2.png)
-
-
-Elazar et al. (2022) in **Cognitive Science.**
-
-<br>
-
-![](imgs/HarriganEtAl2022-Language.png)
-
-Harrigan et al. (2022) in **Language.**
-
-]
-
-
----
-
-## R will keep numeric-looking data numeric
-
---
-
-.pull-left[
+Store categorical variables as factors.
 
 ```{r}
-head(anx, 3)
+anx <- anx |> 
+  mutate(rating = factor(rating))
 ```
 
-]
-
 --
 
-.pull-right[
-
-If we allow R's default behaviour, then we can do naughty things with categorical variables:
+Now it's impossible to incorrectly treat them as if they're numeric!
 
 ```{r}
-mean(anx$rating)
-```
-
-]
-
---
-
-But if we **store these variables as factors,** the naughty things become impossible (yay!):
-
-```{r}
-anx <- anx |> mutate(rating = factor(rating))
-
 mean(anx$rating)
 ```
 
@@ -268,7 +249,7 @@ mean(anx$rating)
 
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
-**A common R programming mistake:**
+**A common R mistake:**
 Letting R treat all variables that consist of numbers as numeric.
 ]
 
@@ -277,7 +258,7 @@ Letting R treat all variables that consist of numbers as numeric.
 
 .pull-left[
 `r fontawesome::fa("chart-simple", height = '1em', margin_right = '0.2em')` 
-**An advanced statistical mistake:**
+**An advanced stats mistake:**
 Modelling categorical, ordinal data as if it were numeric.
 ]
 
@@ -286,7 +267,7 @@ Modelling categorical, ordinal data as if it were numeric.
 
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
-**A foundational statistical mistake:**
+**A foundational stats mistake:**
 Interpreting a significant *p*-value as evidence that an effect exists.
 ]
 
@@ -307,7 +288,7 @@ count:false
 
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
-**A common R programming mistake:**
+**A common R mistake:**
 Letting R treat all variables that consist of numbers as numeric.
 ]
 
@@ -317,7 +298,7 @@ When you know a variable is categorical, tell R that using `factor()`.
 
 .pull-left[
 `r fontawesome::fa("chart-simple", height = '1em', margin_right = '0.2em')` 
-**An advanced statistical mistake:**
+**An advanced stats mistake:**
 Modelling categorical, ordinal data as if it were numeric.
 ]
 
@@ -326,22 +307,13 @@ Modelling categorical, ordinal data as if it were numeric.
 
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
-**A foundational statistical mistake:**
+**A foundational stats mistake:**
 Interpreting a significant *p*-value as evidence that an effect exists.
 ]
 
 .pull-right[
 ]
 
-
----
-class: inverse, middle, center
-
-`r fontawesome::fa("magnifying-glass-chart", height = '5em')`
-
-# Modelling an ordinal variable
-
-### The .mono-white[polr()] express
 
 ---
 
@@ -357,8 +329,7 @@ library(MASS)        # MASS contains the polr() function
 anx_fit1 <- polr(
   rating ~ 1,        # intercept-only model, to start
   data = anx, 
-  Hess = TRUE,       # required if we want to use summary()
-  method = 'probit'  # more on this in a moment
+  Hess = TRUE, method = 'probit'  # ask me in the Q+A!
 )
 ```
 
@@ -369,6 +340,8 @@ anx_fit1 <- polr(
 ```{r anx_fit1-summary, message=F}
 summary(anx_fit1)
 ```
+
+
 
 ---
 
@@ -395,12 +368,6 @@ get_probs_btwn_thresholds <- function(zetas){
 
 
 ```{r plot-underlying-normal, echo = F, fig.width = 12, fig.height = 6}
-# prob_labs <- tibble(
-#   x = c(-3, -1.4, -0.5, 0.1, 0.7, 1.5),
-#   d = c(0.05),
-#   labs = c('Prob:', round(get_probs_btwn_thresholds(anx_fit1$zeta), 2))
-# )
-
 rating_labs <- tibble(
   x = c(-2.6, -1.4, -0.5, 0.1, 0.7, 1.5),
   d = c(0.45),
@@ -411,8 +378,6 @@ p_underlying_normal <- tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) 
   mutate(d = dnorm(x = x)) %>% 
   ggplot(aes(x = x, y = d)) +
   geom_area(fill = '#2e3836', alpha = 0.4) +
-  # geom_vline(xintercept = anx_fit1$zeta, linetype = 'dotted', linewidth = 2) +  # thresholds
-  # geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 12) +
   scale_x_continuous(
     'Anxiety (imaginary underlying variable)',
     breaks = -3:3,
@@ -494,15 +459,8 @@ p_underlying_normal +
   NULL
 ```
 
-
 ---
-class: inverse, middle, center
 
-`r fontawesome::fa("mars-and-venus-burst", height = '5em')`
-
-# Stats anxiety and gender
-
----
 
 #### How does a student's gender affect how they respond to "Going to ask my statistics teacher for individual help with material I am having difficulty understanding"?
 
@@ -511,6 +469,9 @@ class: inverse, middle, center
 .pull-left[
 
 ```{r plot-gender-bars, echo = FALSE, fig.width=7, fig.height=7}
+anx <- anx |>
+  mutate(gender = factor(gender, levels = c('Female/Woman', 'Male/Man', 'Another Gender')))
+
 anx %>%
   ggplot(aes(x = rating, fill = gender)) +
   geom_bar() +
@@ -533,18 +494,6 @@ anx %>%
 
 .pull-right[
 
-<br> <br>
-
-`r fontawesome::fa("hourglass-start", margin_right = '0.2em', height = '1em')` **First:** Think to yourself about the questions.
-
-`r fontawesome::fa("hourglass-half", margin_right = '0.2em', height = '1em')` **Then:** Ask your neighbour what they think. What's their reasoning? What's yours?
-
-`r fontawesome::fa("hourglass-end", margin_right = '0.2em', height = '1em')` **Afterward:** we'll look at the model's estimates together and discuss.
-
-]
-
----
-
 ```{r anx_fit2-fit-manip, echo = F}
 anx_fit2 <- polr(
   rating ~ gender,
@@ -559,64 +508,48 @@ anx_fit2_latent_normals <- tibble(
 ) |>
   tidyr::expand(
     nesting(Gender, mu),
-    x = seq(from = -4, to = 4, length.out = 200)
+    x = seq(from = -3.5, to = 3.5, length.out = 200)
   ) |>
   mutate(
     d = dnorm(x, mean = mu, sd = 1)  # get dens at each x value for normal distrib with each row's mu
   )
-
-get_thresholds_anx_fit2 <- function(levelname){
-  # levelname: string, one of 'Female/Woman', 'Male/Man', 'Another Gender'
-  
-  eta_male <- anx_fit2$coefficients[['genderMale/Man']] 
-  eta_anot <- anx_fit2$coefficients[['genderAnother Gender']] 
-  x_male <- contrasts(anx$gender)[levelname,][['Male/Man']]
-  x_anot <- contrasts(anx$gender)[levelname,][['Another Gender']]
-  
-  # no link function, but computing the position on the Phi scale of each threshold using the following specifications:
-  # linkfn(Phat(Y <= 1)) = –0.90 – (–0.33 * `Male/Man`) – (0.48 * `Another Gender`)
-  phi_12 <- anx_fit2$zeta[['1|2']] - (eta_male * x_male) - (eta_anot * x_anot)
-  
-  # linkfn(Phat(Y <= 2)) = –0.22 – (–0.33 * `Male/Man`) – (0.48 * `Another Gender`)
-  phi_23 <- anx_fit2$zeta[['2|3']] - (eta_male * x_male) - (eta_anot * x_anot)
-  
-  # linkfn(Phat(Y <= 3)) =  0.33 – (–0.33 * `Male/Man`) – (0.48 * `Another Gender`)
-  phi_34 <- anx_fit2$zeta[['3|4']] - (eta_male * x_male) - (eta_anot * x_anot)
-  
-  # linkfn(Phat(Y <= 4)) =  0.99 – (–0.33 * `Male/Man`) – (0.48 * `Another Gender`)
-  phi_45 <- anx_fit2$zeta[['4|5']] - (eta_male * x_male) - (eta_anot * x_anot)
-  
-  return( c('1|2' = phi_12, '2|3' = phi_23, '3|4' = phi_34, '4|5' = phi_45) )
-}
-
-fem_probs <- get_probs_btwn_thresholds( get_thresholds_anx_fit2('Female/Woman') )
 ```
 
-
-.center[
-
-```{r include=F}
+```{r normals-stacked-onlyfem, echo=F, fig.width = 7, fig.height = 7}
 rating_labs <- tibble(
-  x = c(-2.6, -1.4, -0.5, 0.1, 0.7, 1.5),
-  d = c(0.3),
-  labs = c('Rating:', 1:5),
-  Gender = c('Female/Woman')
+  x = c(-2.6, -1.4, -0.55, 0.06, 0.65, 1.5),
+  d = c(0.55),
+labs = c('Rating:', 1:5),
+  Gender = factor(c('Female/Woman'), levels = c('Female/Woman', 'Male/Man', 'Another Gender'))
+)
+
+q_labs <- tibble(
+  x = 0.06,
+  d = 0.3,
+  labs = '?',
+  Gender = factor(c('Male/Man', 'Another Gender'), levels = c('Female/Woman', 'Male/Man', 'Another Gender'))
 )
 
 anx_fit2_latent_normals |>
-  filter(Gender == 'Female/Woman') |>
   ggplot(aes(x = x, y = d, fill = Gender)) +
+  facet_wrap(~ Gender, nrow=3, scale = 'free') +
   geom_area(position = 'identity', alpha = 0.5) +
-  geom_vline(xintercept = anx_fit2$zeta, linetype = 'dotted', linewidth = 2) +
-  geom_vline(xintercept = 0, colour = palette_gender[1]) +
-  geom_text(data = rating_labs, aes(label = labs), family = 'Fira Sans', size = 24) +
-  scale_fill_manual(values = palette_gender) +
+  geom_vline(xintercept = anx_fit2$zeta, linetype = 'dotted', linewidth = 1) +
+  # geom_vline(xintercept = 0, colour = palette_gender[1], linewidth = 1.5) +
+  geom_text(data = rating_labs, aes(label = labs), family = 'Fira Sans', size = 8) +
+  geom_text(data = q_labs, aes(label = labs), family = 'Fira Sans', size = 12) +
+  scale_fill_manual(values = c(palette_gender[1], '#FFF', '#FFF')) +
   theme_classic() +
   theme(
     axis.line.x.top = element_blank(),
-    text = element_text(family = 'Fira Sans', size = 24)
+    axis.ticks.x.top = element_blank(),
+    strip.placement = 'outside',
+    strip.background = element_blank(),
+    text = element_text(family = 'Fira Sans', size = 24),
+    axis.text.x.top = element_text(family = 'Fira Sans', size = 16, colour = 'black'),
+    legend.position = 'none'
   ) +
-  scale_y_continuous(NULL, breaks = NULL, limits = c(0, 0.5)) +
+  scale_y_continuous(NULL, breaks = NULL, limits = c(0, 0.6)) +
   scale_x_continuous(
     'Anxiety (imaginary underlying variable)', 
     breaks = -3:3,
@@ -628,8 +561,14 @@ anx_fit2_latent_normals |>
   NULL
 ```
 
+]
 
-```{r fem-normal, echo=F, fig.width = 13, fig.height = 8}
+---
+
+
+.center[
+
+```{r fem-normal-solo, echo=F, fig.width = 13, fig.height = 8}
 rating_labs <- tibble(
   x = c(-2.6, -1.4, -0.6, 0.1, 0.7, 1.5),
   d = c(0.57),
@@ -666,6 +605,7 @@ p_fem_normal <- anx_fit2_latent_normals |>
 
 p_fem_normal
 ```
+
 ]
 
 ---
@@ -747,43 +687,6 @@ anx_fit2_latent_normals |>
 
 ---
 
-```{r include=F}
-anx_fit2 <- polr(
-  rating ~ gender,
-  data = anx,
-  method = 'probit',
-  Hess = TRUE
-)
-```
-
-
-```{r anx_fit2-display, eval = FALSE}
-anx_fit2 <- polr(
-  rating ~ gender,
-  data = anx,
-  method = 'probit',
-  Hess = TRUE
-)
-summary(anx_fit2)
-```
-
-```
-## Coefficients:
-##                        Value Std. Error t value
-## genderMale/Man       -0.3280    0.03015 -10.880
-## genderAnother Gender  0.4846    0.11992   4.041
-## 
-## Intercepts:
-##     Value    Std. Error t value 
-## 1|2  -0.9045   0.0169   -53.5402
-## 2|3  -0.2246   0.0150   -14.9847
-## 3|4   0.3318   0.0151    21.9158
-## 4|5   0.9889   0.0176    56.2958
-```
-
----
-
-
 .pull-left[
 ## The mistake
 ]
@@ -793,7 +696,7 @@ summary(anx_fit2)
 <!--  -->
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
-**A common R programming mistake:**
+**A common R mistake:**
 Letting R treat all variables that consist of numbers as numeric.
 ]
 .pull-right[
@@ -802,7 +705,7 @@ When you know a variable is categorical, tell R that using `factor()`.
 <!--  -->
 .pull-left[
 `r fontawesome::fa("chart-simple", height = '1em', margin_right = '0.2em')` 
-**An advanced statistical mistake:**
+**An advanced stats mistake:**
 Modelling categorical, ordinal data as if it were numeric.
 ]
 .pull-right[
@@ -810,7 +713,7 @@ Modelling categorical, ordinal data as if it were numeric.
 <!--  -->
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
-**A foundational statistical mistake:**
+**A foundational stats mistake:**
 Interpreting a significant *p*-value as evidence that an effect exists.
 ]
 .pull-right[
@@ -828,7 +731,7 @@ count: false
 <!--  -->
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
-**A common R programming mistake:**
+**A common R mistake:**
 Letting R treat all variables that consist of numbers as numeric.
 ]
 .pull-right[
@@ -837,7 +740,7 @@ When you know a variable is categorical, tell R that using `factor()`.
 <!--  -->
 .pull-left[
 `r fontawesome::fa("chart-simple", height = '1em', margin_right = '0.2em')` 
-**An advanced statistical mistake:**
+**An advanced stats mistake:**
 Modelling categorical, ordinal data as if it were numeric.
 ]
 .pull-right[
@@ -846,18 +749,11 @@ Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`).
 <!--  -->
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
-**A foundational statistical mistake:**
+**A foundational stats mistake:**
 Interpreting a significant *p*-value as evidence that an effect exists.
 ]
 .pull-right[
 ]
-
----
-class: inverse, middle, center
-
-`r fontawesome::fa("asterisk", height = '5em')`
-
-# Interpreting *p*-values
 
 ---
 
@@ -878,14 +774,79 @@ No *p*-values in the model summary.
 
 --
 
-But it's common practice to compare these *t*-values to a standard normal distribution.
+But it's common practice to compare these *t*-values to a standard normal distribution, like *z*-scores.
 
 --
 
-```{r anx_fit2-coef-pvals1, echo=T}
+```{r anx_fit2-coef-pvals1, include=F}
 pnorm(abs(-10.880), lower.tail = FALSE) * 2
 pnorm(abs(  4.041), lower.tail = FALSE) * 2
 ```
+
+```{r zscore-mm, echo=F, fig.width = 9, fig.height = 1.5}
+mm_t <- -10.88
+
+tibble(x = seq(from = -11, to = 11, length.out = 500)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0.4) +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept = mm_t) +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept = -mm_t) +
+  geom_text(
+    aes(x = -10.5, y = 0.2), 
+    colour = '#bb3725', label = 't = –10.88\np < 0.001',
+    family = "Fira Sans", size = 8,
+    hjust = 0
+    ) +
+  scale_x_continuous(
+    NULL,
+    breaks = seq(-10, 10, 5)) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.4)
+    ) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+  ) +
+  NULL
+```
+
+
+
+```{r zscore-ag, echo=F, fig.width = 9, fig.height = 1.5}
+ag_t <-  4.041
+
+tibble(x = seq(from = -11, to = 11, length.out = 500)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0.4) +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept =  ag_t) +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept = -ag_t) +
+  geom_text(
+    aes(x = -3.5, y = 0.2), 
+    colour = '#bb3725', label = 't = 4.041\np < 0.001',
+    family = "Fira Sans", size = 8,
+    hjust = 0
+    ) +
+  scale_x_continuous(
+    NULL,
+    breaks = seq(-10, 10, 5)) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.4)
+    ) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+  ) +
+  NULL
+```
+
+
+
 
 ???
 
@@ -994,11 +955,46 @@ summary(sim_fit)
 
 --
 
-```{r}
+
+```{r zscore-sim, echo=F, fig.width = 9, fig.height = 1.5}
+sim_t <-  -2.009
+
+tibble(x = seq(from = -4.5, to = 4.5, length.out = 500)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_ribbon(aes(x = ifelse(x >= sim_t & x <= -sim_t, x, NA), ymin = 0, ymax = d), alpha = 0.4, fill = "#2e3836") +
+  geom_ribbon(aes(x = ifelse(x < sim_t, x, NA), ymin = 0, ymax = d), alpha = 0.6, fill = "#BB3725") +
+  geom_ribbon(aes(x = ifelse(x > -sim_t, x, NA), ymin = 0, ymax = d), alpha = 0.6, fill = "#BB3725") +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept =  sim_t) +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept = -sim_t) +
+  geom_text(
+    aes(x = -4.2, y = 0.2), 
+    colour = '#bb3725', label = 't = –2.009\np < 0.05',
+    family = "Fira Sans", size = 8,
+    hjust = 0
+    ) +
+  scale_x_continuous(
+    NULL,
+    breaks = seq(-6, 6, 2)) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.4)
+    ) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+  ) +
+  NULL
+```
+
+```{r include=F}
 pnorm(abs(-2.009), lower.tail = FALSE) * 2
 ```
 
-So *p* is below 0.05, but in the true population, Group A and Group B were identical!
+<br>
+
+So *p* is significant, but in the true population, Group A and Group B were identical!
 
 ---
 
@@ -1012,7 +1008,7 @@ So *p* is below 0.05, but in the true population, Group A and Group B were ident
 <!--  -->
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
-**A common R programming mistake:**
+**A common R mistake:**
 Letting R treat all variables that consist of numbers as numeric.
 ]
 .pull-right[
@@ -1021,7 +1017,7 @@ When you know a variable is categorical, tell R that using `factor()`.
 <!--  -->
 .pull-left[
 `r fontawesome::fa("chart-simple", height = '1em', margin_right = '0.2em')` 
-**An advanced statistical mistake:**
+**An advanced stats mistake:**
 Modelling categorical, ordinal data as if it were numeric.
 ]
 .pull-right[
@@ -1030,7 +1026,7 @@ Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`).
 <!--  -->
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
-**A foundational statistical mistake:**
+**A foundational stats mistake:**
 Interpreting a significant *p*-value as evidence that an effect exists.
 ]
 .pull-right[
@@ -1048,7 +1044,7 @@ count:false
 <!--  -->
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
-**A common R programming mistake:**
+**A common R mistake:**
 Letting R treat all variables that consist of numbers as numeric.
 ]
 .pull-right[
@@ -1057,7 +1053,7 @@ When you know a variable is categorical, tell R that using `factor()`.
 <!--  -->
 .pull-left[
 `r fontawesome::fa("chart-simple", height = '1em', margin_right = '0.2em')` 
-**An advanced statistical mistake:**
+**An advanced stats mistake:**
 Modelling categorical, ordinal data as if it were numeric.
 ]
 .pull-right[
@@ -1066,7 +1062,7 @@ Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`).
 <!--  -->
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
-**A foundational statistical mistake:**
+**A foundational stats mistake:**
 Interpreting a significant *p*-value as evidence that an effect exists.
 ]
 .pull-right[
@@ -1105,3 +1101,130 @@ count: false
 - A. Solomon Kurz' (2021) blog post _[Notes on the Bayesian cumulative probit](https://stats.oarc.ucla.edu/r/dae/ordinal-logistic-regression/)_
 
 - Gelman & Hill's (2007) book _[Data Analysis Using Regression and Multilevel/Hierarchical Models](https://www.cambridge.org/highereducation/books/data-analysis-using-regression-and-multilevel-hierarchical-models/32A29531C7FD730C3A68951A17C9D983)_
+
+
+---
+
+<!-- GRAVEYARD -->
+
+<!-- ## But first: -->
+
+<!-- Go to `menti.com` and enter code `3459 5977`. -->
+
+<!-- Or scan QR code: -->
+
+<!-- ![:scale 30%](imgs/DEMO-qr.png) -->
+
+
+<!-- --- -->
+<!-- class: inverse, middle, center -->
+
+<!-- `r fontawesome::fa("table", height = '5em')` -->
+
+<!-- # The data we'll use -->
+
+<!-- --- -->
+
+<!-- ## The SMARVUS dataset (Terry et al., 2023) -->
+
+<!-- .center[SMARVUS = **S**tatistics and **M**athematics **A**nxieties and **R**elated **V**ariables in **U**niversity **S**tudents] -->
+
+<!-- -- -->
+
+<!-- .pull-left[ -->
+<!-- A survey of *n* = 18,841 students (mostly Psychology UGs) from 35 countries. -->
+
+<!-- Students rated their anxiety from 1 (no anxiety) to 5 (a great deal of anxiety) in scenarios like: -->
+
+<!-- - Studying for a statistics test. -->
+
+<!-- - Interpreting the meaning of a table in a journal article. -->
+
+<!-- - **Going to ask my statistics teacher for individual help with material I am having difficulty understanding. → **  -->
+<!-- ] -->
+
+<!-- -- -->
+
+<!-- .pull-right[ -->
+
+<!-- ```{r read-in-anx, include=F} -->
+<!-- anx <- read_csv('data/anx.csv') -->
+<!-- anx <- select(anx, unique_id, gender, score) |>  -->
+<!--   rename(rating = score) |> -->
+<!--   mutate(gender = factor(gender, levels = c('Female/Woman', 'Male/Man', 'Another Gender'))) -->
+<!-- ``` -->
+
+<!-- ```{r bar-aggregated, echo=F, fig.width=7, fig.height=5.5} -->
+<!-- anx |> -->
+<!--   ggplot(aes(x = factor(rating))) + -->
+<!--   geom_bar(fill = '#2e3836') + -->
+<!--   theme_classic() + -->
+<!--   theme(text = element_text(family = "Fira Sans", size = 24)) + -->
+<!--   labs( -->
+<!--     x = element_blank(), -->
+<!--     y = 'Count', -->
+<!--     caption = 'n = 8,314' -->
+<!--   ) + -->
+<!--   scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\nof anxiety)')) + -->
+<!--   NULL -->
+<!-- ``` -->
+
+<!-- ] -->
+
+
+<!-- --- -->
+<!-- class: inverse, middle, center -->
+
+<!-- `r fontawesome::fa("magnifying-glass-chart", height = '5em')` -->
+
+<!-- # Modelling an ordinal variable -->
+
+<!-- ### The .mono-white[polr()] express -->
+
+
+<!-- --- -->
+<!-- class: inverse, middle, center -->
+
+<!-- `r fontawesome::fa("asterisk", height = '5em')` -->
+
+<!-- # Interpreting *p*-values -->
+
+
+<!-- --- -->
+<!-- class: inverse, middle, center -->
+
+<!-- `r fontawesome::fa("mars-and-venus-burst", height = '5em')` -->
+
+<!-- # Stats anxiety and gender -->
+
+<!-- <br> <br> -->
+
+<!-- `r fontawesome::fa("hourglass-start", margin_right = '0.2em', height = '1em')` **First:** Think to yourself about the questions. -->
+
+<!-- `r fontawesome::fa("hourglass-half", margin_right = '0.2em', height = '1em')` **Then:** Ask your neighbour what they think. What's their reasoning? What's yours? -->
+
+<!-- `r fontawesome::fa("hourglass-end", margin_right = '0.2em', height = '1em')` **Afterward:** we'll look at the model's estimates together and discuss. -->
+
+<!-- ```{r anx_fit2-display, eval = FALSE} -->
+<!-- anx_fit2 <- polr( -->
+<!--   rating ~ gender, -->
+<!--   data = anx, -->
+<!--   method = 'probit', -->
+<!--   Hess = TRUE -->
+<!-- ) -->
+<!-- summary(anx_fit2) -->
+<!-- ``` -->
+
+<!-- ``` -->
+<!-- ## Coefficients: -->
+<!-- ##                        Value Std. Error t value -->
+<!-- ## genderMale/Man       -0.3280    0.03015 -10.880 -->
+<!-- ## genderAnother Gender  0.4846    0.11992   4.041 -->
+<!-- ##  -->
+<!-- ## Intercepts: -->
+<!-- ##     Value    Std. Error t value  -->
+<!-- ## 1|2  -0.9045   0.0169   -53.5402 -->
+<!-- ## 2|3  -0.2246   0.0150   -14.9847 -->
+<!-- ## 3|4   0.3318   0.0151    21.9158 -->
+<!-- ## 4|5   0.9889   0.0176    56.2958 -->
+<!-- ``` -->
