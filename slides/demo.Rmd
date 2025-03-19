@@ -153,8 +153,6 @@ anx |>
   NULL
 ```
 
-]
-
 ---
 
 ### The data: Students' anxiety ratings for "Going to ask my statistics teacher for individual help with material I am having difficulty understanding."
@@ -172,9 +170,9 @@ slice(anx, 45:50)
 
 .pull-right[
 
-`rating` looks like numbers, and R treats it like numbers.
+`rating` looks like numbers, and R treats it like numbers, as `dbl`.
 
-And we can manipulate it like numbers.
+So it's tempting to manipulate it like numbers.
 
 ```{r}
 mean(anx$rating)
@@ -268,7 +266,7 @@ Modelling categorical, ordinal data as if it were numeric.
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
 **A foundational stats mistake:**
-Interpreting a significant *p*-value as evidence that an effect exists.
+Interpreting a significant *p*-value as evidence that an effect exists in the real world.
 ]
 
 .pull-right[
@@ -308,7 +306,7 @@ Modelling categorical, ordinal data as if it were numeric.
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
 **A foundational stats mistake:**
-Interpreting a significant *p*-value as evidence that an effect exists.
+Interpreting a significant *p*-value as evidence that an effect exists in the real world.
 ]
 
 .pull-right[
@@ -319,7 +317,7 @@ Interpreting a significant *p*-value as evidence that an effect exists.
 
 ## Model ordinal data with `polr()`
 
-polr = **P**roportional **O**dds **L**ogistic **R**egression
+<!-- polr = **P**roportional **O**dds **L**ogistic **R**egression -->
 
 --
 
@@ -714,7 +712,7 @@ Modelling categorical, ordinal data as if it were numeric.
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
 **A foundational stats mistake:**
-Interpreting a significant *p*-value as evidence that an effect exists.
+Interpreting a significant *p*-value as evidence that an effect exists in the real world.
 ]
 .pull-right[
 ]
@@ -750,7 +748,7 @@ Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`).
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
 **A foundational stats mistake:**
-Interpreting a significant *p*-value as evidence that an effect exists.
+Interpreting a significant *p*-value as evidence that an effect exists in the real world.
 ]
 .pull-right[
 ]
@@ -774,7 +772,7 @@ No *p*-values in the model summary.
 
 --
 
-But it's common practice to compare these *t*-values to a standard normal distribution, like *z*-scores.
+But it's common practice to compare these *t*-values to a standard normal distribution.
 
 --
 
@@ -813,6 +811,7 @@ tibble(x = seq(from = -11, to = 11, length.out = 500)) %>%
   NULL
 ```
 
+--
 
 
 ```{r zscore-ag, echo=F, fig.width = 9, fig.height = 1.5}
@@ -858,6 +857,8 @@ Since both *p*-values are below 0.05:
 ---
 
 ### Why don't significant *p*-values mean an effect exists?
+
+--
 
 Because we can also get significant *p*-values when there really is *no* effect.
 
@@ -1027,7 +1028,7 @@ Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`).
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
 **A foundational stats mistake:**
-Interpreting a significant *p*-value as evidence that an effect exists.
+Interpreting a significant *p*-value as evidence that an effect exists in the real world.
 ]
 .pull-right[
 ]
@@ -1063,17 +1064,128 @@ Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`).
 .pull-left[
 `r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
 **A foundational stats mistake:**
-Interpreting a significant *p*-value as evidence that an effect exists.
+Interpreting a significant *p*-value as evidence that an effect exists in the real world.
 ]
 .pull-right[
-Understand that significant *p*-values can arise even if no effect exists.
+Understand that significant *p*-values can arise even if no effect exists in the real world.
+]
+
+---
+
+```{r anx-normal-end1, echo=F, fig.width = 12, height = 7}
+rating_labs <- tibble(
+  x = c(-2.6, -1.4, -0.65, 0, 0.65, 1.4),
+  d = c(0.45),
+  labs = c('Rating:', 1:5)
+)
+
+tibble(x = seq(from = -4.5, to = 4.5, length.out = 200)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0.4) +
+  geom_vline(xintercept = seq(-1, 1, length.out = 4), linetype = 'dotted', linewidth = 1.5) +
+  geom_text(data = rating_labs, aes(label = labs), family = 'Fira Sans', size = 12) +
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)',
+    breaks = -3:3,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit1$zeta %>% as.double(),
+      labels = round(anx_fit1$zeta, 2)
+    )
+  ) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.5)
+  ) +
+  coord_cartesian(xlim = c(-3, 3)) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+    axis.line.x.top = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.x.bottom = element_blank(),
+    axis.text.x.top = element_text(size=28, colour = 'white')
+  ) +
+  NULL
+```
+
+---
+count:false
+
+```{r anx-normal-end2, echo=F, fig.width = 12, height = 7}
+tibble(x = seq(from = -3, to = 3, length.out = 200)) %>% 
+  mutate(d = dnorm(x = x, mean = -2)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0.4) +
+  geom_vline(xintercept = seq(-1, 1, length.out = 4), linetype = 'dotted', linewidth = 1.5) +
+  geom_text(data = rating_labs, aes(label = labs), family = 'Fira Sans', size = 12) +
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)',
+    breaks = -3:3,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit1$zeta %>% as.double(),
+      labels = round(anx_fit1$zeta, 2)
+    )
+  ) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.5)
+  ) +
+  coord_cartesian(xlim = c(-3, 3)) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+    axis.line.x.top = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.x.bottom = element_blank(),
+    axis.text.x.top = element_text(size=28, colour = 'white')
+  ) +
+  NULL
+```
+
+---
+
+.pull-left[
+## The mistake
+]
+.pull-right[
+## How you'll avoid it
+]
+<!--  -->
+.pull-left[
+`r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
+**A common R mistake:**
+Letting R treat all variables that consist of numbers as numeric.
+]
+.pull-right[
+When you know a variable is categorical, tell R that using `factor()`.
+]
+<!--  -->
+.pull-left[
+`r fontawesome::fa("chart-simple", height = '1em', margin_right = '0.2em')` 
+**An advanced stats mistake:**
+Modelling categorical, ordinal data as if it were numeric.
+]
+.pull-right[
+Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`).
+]
+<!--  -->
+.pull-left[
+`r fontawesome::fa("asterisk", height = '1em', margin_right = '0.2em')`
+**A foundational stats mistake:**
+Interpreting a significant *p*-value as evidence that an effect exists in the real world.
+]
+.pull-right[
+Understand that significant *p*-values can arise even if no effect exists in the real world.
 ]
 
 --
 
-<br>
-
-.center[**Thank you! `r fontawesome::fa("face-smile-beam", height = '2em', vertical_align = '-0.5em', margin_left = '0.2em', margin_right = '0.2em')` Time for questions!**]
+.center[**Thank you! `r fontawesome::fa("face-smile-beam", height = '1em', margin_left = '0.2em', margin_right = '0.2em')` Time for questions!**]
 
 ---
 count: false
@@ -1092,139 +1204,14 @@ Terry, J., Ross, R. M., Nagy, T., Salgado, M., Garrido-Vásquez, P., Sarfo, J. O
 ---
 count: false
 
-## Helpful resources
+## Some really nice resources
 
-- Jamieson's (2004) paper _[Likert scales: How to (ab)use them](https://onlinelibrary.wiley.com/doi/10.1111/j.1365-2929.2004.02012.x)_
+- Jamieson's (2004) paper **[Likert scales: How to (ab)use them.](https://onlinelibrary.wiley.com/doi/10.1111/j.1365-2929.2004.02012.x)**
 
-- UCLA Statistical Methods and Data Analytics's web page _[Ordinal Logistic Regression](https://stats.oarc.ucla.edu/r/dae/ordinal-logistic-regression/)_
+- UCLA Statistical Methods and Data Analytics's web page **[Ordinal Logistic Regression.](https://stats.oarc.ucla.edu/r/dae/ordinal-logistic-regression/)**
 
-- A. Solomon Kurz' (2021) blog post _[Notes on the Bayesian cumulative probit](https://stats.oarc.ucla.edu/r/dae/ordinal-logistic-regression/)_
+- Kurz' (2021) blog post **[Notes on the Bayesian cumulative probit.](https://stats.oarc.ucla.edu/r/dae/ordinal-logistic-regression/)**
 
-- Gelman & Hill's (2007) book _[Data Analysis Using Regression and Multilevel/Hierarchical Models](https://www.cambridge.org/highereducation/books/data-analysis-using-regression-and-multilevel-hierarchical-models/32A29531C7FD730C3A68951A17C9D983)_
+- Vasishth and Nicenboim's (2016) paper **[Statistical Methods for Linguistic Research: Foundational Ideas – Part I.](https://doi.org/10.1111/lnc3.12201)**
 
-
----
-
-<!-- GRAVEYARD -->
-
-<!-- ## But first: -->
-
-<!-- Go to `menti.com` and enter code `3459 5977`. -->
-
-<!-- Or scan QR code: -->
-
-<!-- ![:scale 30%](imgs/DEMO-qr.png) -->
-
-
-<!-- --- -->
-<!-- class: inverse, middle, center -->
-
-<!-- `r fontawesome::fa("table", height = '5em')` -->
-
-<!-- # The data we'll use -->
-
-<!-- --- -->
-
-<!-- ## The SMARVUS dataset (Terry et al., 2023) -->
-
-<!-- .center[SMARVUS = **S**tatistics and **M**athematics **A**nxieties and **R**elated **V**ariables in **U**niversity **S**tudents] -->
-
-<!-- -- -->
-
-<!-- .pull-left[ -->
-<!-- A survey of *n* = 18,841 students (mostly Psychology UGs) from 35 countries. -->
-
-<!-- Students rated their anxiety from 1 (no anxiety) to 5 (a great deal of anxiety) in scenarios like: -->
-
-<!-- - Studying for a statistics test. -->
-
-<!-- - Interpreting the meaning of a table in a journal article. -->
-
-<!-- - **Going to ask my statistics teacher for individual help with material I am having difficulty understanding. → **  -->
-<!-- ] -->
-
-<!-- -- -->
-
-<!-- .pull-right[ -->
-
-<!-- ```{r read-in-anx, include=F} -->
-<!-- anx <- read_csv('data/anx.csv') -->
-<!-- anx <- select(anx, unique_id, gender, score) |>  -->
-<!--   rename(rating = score) |> -->
-<!--   mutate(gender = factor(gender, levels = c('Female/Woman', 'Male/Man', 'Another Gender'))) -->
-<!-- ``` -->
-
-<!-- ```{r bar-aggregated, echo=F, fig.width=7, fig.height=5.5} -->
-<!-- anx |> -->
-<!--   ggplot(aes(x = factor(rating))) + -->
-<!--   geom_bar(fill = '#2e3836') + -->
-<!--   theme_classic() + -->
-<!--   theme(text = element_text(family = "Fira Sans", size = 24)) + -->
-<!--   labs( -->
-<!--     x = element_blank(), -->
-<!--     y = 'Count', -->
-<!--     caption = 'n = 8,314' -->
-<!--   ) + -->
-<!--   scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\nof anxiety)')) + -->
-<!--   NULL -->
-<!-- ``` -->
-
-<!-- ] -->
-
-
-<!-- --- -->
-<!-- class: inverse, middle, center -->
-
-<!-- `r fontawesome::fa("magnifying-glass-chart", height = '5em')` -->
-
-<!-- # Modelling an ordinal variable -->
-
-<!-- ### The .mono-white[polr()] express -->
-
-
-<!-- --- -->
-<!-- class: inverse, middle, center -->
-
-<!-- `r fontawesome::fa("asterisk", height = '5em')` -->
-
-<!-- # Interpreting *p*-values -->
-
-
-<!-- --- -->
-<!-- class: inverse, middle, center -->
-
-<!-- `r fontawesome::fa("mars-and-venus-burst", height = '5em')` -->
-
-<!-- # Stats anxiety and gender -->
-
-<!-- <br> <br> -->
-
-<!-- `r fontawesome::fa("hourglass-start", margin_right = '0.2em', height = '1em')` **First:** Think to yourself about the questions. -->
-
-<!-- `r fontawesome::fa("hourglass-half", margin_right = '0.2em', height = '1em')` **Then:** Ask your neighbour what they think. What's their reasoning? What's yours? -->
-
-<!-- `r fontawesome::fa("hourglass-end", margin_right = '0.2em', height = '1em')` **Afterward:** we'll look at the model's estimates together and discuss. -->
-
-<!-- ```{r anx_fit2-display, eval = FALSE} -->
-<!-- anx_fit2 <- polr( -->
-<!--   rating ~ gender, -->
-<!--   data = anx, -->
-<!--   method = 'probit', -->
-<!--   Hess = TRUE -->
-<!-- ) -->
-<!-- summary(anx_fit2) -->
-<!-- ``` -->
-
-<!-- ``` -->
-<!-- ## Coefficients: -->
-<!-- ##                        Value Std. Error t value -->
-<!-- ## genderMale/Man       -0.3280    0.03015 -10.880 -->
-<!-- ## genderAnother Gender  0.4846    0.11992   4.041 -->
-<!-- ##  -->
-<!-- ## Intercepts: -->
-<!-- ##     Value    Std. Error t value  -->
-<!-- ## 1|2  -0.9045   0.0169   -53.5402 -->
-<!-- ## 2|3  -0.2246   0.0150   -14.9847 -->
-<!-- ## 3|4   0.3318   0.0151    21.9158 -->
-<!-- ## 4|5   0.9889   0.0176    56.2958 -->
-<!-- ``` -->
+- Gelman and Hill's (2007) book **[Data Analysis Using Regression and Multilevel/Hierarchical Models.](https://www.cambridge.org/highereducation/books/data-analysis-using-regression-and-multilevel-hierarchical-models/32A29531C7FD730C3A68951A17C9D983)**
