@@ -1,0 +1,21 @@
+---
+title: Detailed analyses
+---
+
+This page contains (1) an extended analysis of the anxiety data from the teaching presentation using `MASS::polr()`.
+
+It also illustrates two less good ways to analyse ordinal data: (2) just treating it as numeric and using a Gaussian model, and (3) first converting it to z-scores and then using a Gaussian model.
+
+# (1) Ordinal regression with `polr()`
+
+lorem ipsum
+
+
+# (2) Gaussian regression model with `lm()`
+
+lorem ipsum
+
+
+# (3) z-score conversion then Gaussian regression model with `lm()`
+
+lorem ipsum

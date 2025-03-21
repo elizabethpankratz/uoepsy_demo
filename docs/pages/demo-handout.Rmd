@@ -1,0 +1,606 @@
+---
+title: "Three common mistakes in statistics and how to avoid them"
+author: "Elizabeth Pankratz"
+date: "26 March 2025"
+output: word_document
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(MASS)
+
+# To solve some conflicts between packages
+select <- dplyr::select
+
+# knitr settings
+knitr::opts_chunk$set(
+  fig.retina=3,
+  fig.align = "center",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+knitr::opts_knit$set(root.dir = here::here())
+
+# dplyr and ggplot settings
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_bw())
+theme_update(
+  text = element_text(family = "Fira Sans", size = 18),
+  axis.title.y = element_text(angle=0, vjust=0.5, hjust = 0),
+  panel.grid = element_blank(),
+  strip.background = element_blank()
+)
+
+palette_gender <- c( '#882e72', '#1965b0', '#4eb265')
+palette_ab <- c('#72190e', '#F1932D')
+```
+
+
+# Something you won’t be able to unsee
+
+![](../imgs/ReederEtAl2017-JML.png)
+
+Taking the means of discrete ratings is very common—but a little strange!
+
+
+# Why Likert scale ratings aren’t continuous numeric
+
+TODO add likert graphics
+
+Numbers on a Likert scale are just labels.
+
+# The mistake and how you'll avoid it
+
+TODO delete 1–3
+
+| **The mistake** | **How you'll avoid it** |
+|---|---|
+| **A common R mistake:** Letting R treat all variables that look like numbers as continuous numeric. | When a variable comes from a Likert scale, tell R it’s categorical using `factor()`. |
+| **A foundational stats mistake:** Modelling categorical, ordinal data as if it were numeric. | Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`). |
+| **A foundational stats mistake:** Interpreting a significant *p*-value as evidence that an effect exists in the real world. | Understand that significant *p*-values can arise even if no effect exists in the real world. |
+
+
+# The data: Students’ anxiety ratings for “Going to ask my statistics teacher for individual help with material I am having difficulty understanding”.
+
+
+```{r read-in-anx, include=F}
+anx <- read_csv('data/anx.csv')
+anx <- select(anx, unique_id, gender, score) |> 
+  rename(rating = score)
+```
+
+```{r bar-aggregated, echo=F, fig.width=8, fig.height=5.5}
+anx |>
+  ggplot(aes(x = factor(rating))) +
+  geom_bar(fill = '#2e3836') +
+  theme_classic() +
+  theme(text = element_text(family = "Fira Sans", size = 24)) +
+  labs(
+    x = element_blank(),
+    y = 'Count',
+    caption = 'n = 8,314'
+  ) +
+  scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\nof anxiety)')) +
+  NULL
+```
+
+
+
+```{r}
+slice(anx, 45:50)
+```
+
+`rating` looks like numbers, and R treats it like numbers, as `dbl`.
+
+So it’s tempting to manipulate it like numbers.
+
+```{r}
+mean(anx$rating)
+```
+
+
+# Remember: We are smarter than R is
+
+Store categorical variables as factors.
+
+```{r}
+anx <- anx |> 
+  mutate(rating = factor(rating))
+```
+
+Now it’s impossible to incorrectly treat them as if they're numeric!
+
+```{r}
+mean(anx$rating)
+```
+
+
+# The mistake and how you'll avoid it
+
+TODO delete 2+3
+
+| **The mistake** | **How you'll avoid it** |
+|---|---|
+| **A common R mistake:** Letting R treat all variables that look like numbers as continuous numeric. | When a variable comes from a Likert scale, tell R it’s categorical using `factor()`. |
+| **A foundational stats mistake:** Modelling categorical, ordinal data as if it were numeric. | Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`). |
+| **A foundational stats mistake:** Interpreting a significant *p*-value as evidence that an effect exists in the real world. | Understand that significant *p*-values can arise even if no effect exists in the real world. |
+
+
+# What ordinal regression models do
+
+```{r fit anx_fit1, include=F}
+library(MASS)
+anx_fit1 <- polr(rating ~ 1, data = anx,  Hess = TRUE, method = 'probit')
+```
+
+```{r plot-underlying-normal-0, echo=F, fig.width = 12, fig.height = 6}
+rating_labs <- tibble(
+  x = c(-2.6, -1.2, -0.5, 0.1, 0.7, 1.3),
+  d = c(0.47),
+  labs = c('Rating:', LETTERS[1:5])
+)
+
+tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0.4) +
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)',
+    breaks = -3:3) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.5)
+    ) +
+  coord_cartesian(xlim = c(-3, 3)) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+    axis.line.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    axis.text.x.top = element_text(size=28, colour = 'white')
+  ) +
+  geom_vline(xintercept = anx_fit1$zeta, linetype = 'dotted', linewidth = 1) +  # thresholds
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)',
+    breaks = -3:3,
+  ) +
+  geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 12) +
+  NULL
+```
+
+
+
+# Fit ordinal regression models with `polr()`
+
+```{r anx_fit1-display, message=F, eval=F}
+library(MASS)        # MASS contains the polr() function
+
+anx_fit1 <- polr(
+  rating ~ 1,        # intercept-only model, to start
+  data = anx, 
+  Hess = TRUE, method = 'probit'  # ask me in the Q+A!
+)
+```
+
+
+```{r anx_fit1-ints, message=F}
+summary(anx_fit1)
+```
+
+TODO prune summary to just intercepts, bold
+
+
+```{r plot-underlying-normal-1, echo=F, fig.width = 12, fig.height = 6}
+
+tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0.4) +
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)',
+    breaks = -3:3,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit1$zeta %>% as.double(),
+      labels = round(anx_fit1$zeta, 2)
+    )
+    ) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.5)
+    ) +
+  coord_cartesian(xlim = c(-3, 3)) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+    axis.line.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    axis.text.x.top = element_text(size=28, colour = 'black')
+  ) +
+  geom_vline(xintercept = anx_fit1$zeta, linetype = 'dotted', linewidth = 1) +  # thresholds
+  geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 12) +
+  NULL
+```
+
+
+# How does a student’s gender affect ratings for “Going to ask my statistics teacher for individual help with material I am having difficulty understanding”?
+
+
+
+```{r plot-gender-bars, echo = FALSE, fig.width=7, fig.height=7}
+anx <- anx |>
+  mutate(gender = factor(gender, levels = c('Female/Woman', 'Male/Man', 'Another Gender')))
+
+anx %>%
+  ggplot(aes(x = rating, fill = gender)) +
+  geom_bar() +
+  facet_wrap(~ gender, scales = 'free', nrow=3) +
+  scale_fill_manual(values = palette_gender) +
+  theme_classic() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        text = element_text(family = 'Fira Sans', size = 24)) +
+  labs(
+    x = element_blank(),
+    y = 'Count'
+  ) +
+  scale_x_discrete(labels = c('A\n(no anxiety)', 'B', 'C', 'D', 'E\n(a great deal\nof anxiety)')) +
+  NULL
+```
+
+
+
+```{r anx_fit2-fit-manip, echo = F}
+anx_fit2 <- polr(
+  rating ~ gender,
+  data = anx,
+  method = 'probit',
+  Hess = TRUE
+)
+
+anx_fit2_latent_normals <- tibble(
+  Gender = factor(c('Female/Woman', 'Male/Man', 'Another Gender'), levels = c('Female/Woman', 'Male/Man', 'Another Gender')),
+  mu     = c(0, coef(anx_fit2))
+) |>
+  tidyr::expand(
+    nesting(Gender, mu),
+    x = seq(from = -3.5, to = 3.5, length.out = 200)
+  ) |>
+  mutate(
+    d = dnorm(x, mean = mu, sd = 1)  # get dens at each x value for normal distrib with each row's mu
+  )
+```
+
+```{r normals-stacked-onlyfem, echo=F, fig.width = 7, fig.height = 7}
+rating_labs <- tibble(
+  x = c(-2.6, -1.4, -0.55, 0.06, 0.65, 1.5),
+  d = c(0.55),
+labs = c('Rating:', LETTERS[1:5]),
+  Gender = factor(c('Female/Woman'), levels = c('Female/Woman', 'Male/Man', 'Another Gender'))
+)
+
+q_labs <- tibble(
+  x = 0.06,
+  d = 0.3,
+  labs = '?',
+  Gender = factor(c('Male/Man', 'Another Gender'), levels = c('Female/Woman', 'Male/Man', 'Another Gender'))
+)
+
+anx_fit2_latent_normals |>
+  ggplot(aes(x = x, y = d, fill = Gender)) +
+  facet_wrap(~ Gender, nrow=3, scale = 'free') +
+  geom_area(position = 'identity', alpha = 0.5) +
+  geom_vline(xintercept = anx_fit2$zeta, linetype = 'dotted', linewidth = 1) +
+  # geom_vline(xintercept = 0, colour = palette_gender[1], linewidth = 1.5) +
+  geom_text(data = rating_labs, aes(label = labs), family = 'Fira Sans', size = 8) +
+  geom_text(data = q_labs, aes(label = labs), family = 'Fira Sans', size = 12) +
+  scale_fill_manual(values = c(palette_gender[1], '#FFF', '#FFF')) +
+  theme_classic() +
+  theme(
+    axis.line.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    strip.placement = 'outside',
+    strip.background = element_blank(),
+    text = element_text(family = 'Fira Sans', size = 24),
+    axis.text.x.top = element_text(family = 'Fira Sans', size = 16, colour = 'black'),
+    axis.title.x.bottom = element_text(size = 18),
+    legend.position = 'none'
+  ) +
+  scale_y_continuous(NULL, breaks = NULL, limits = c(0, 0.6)) +
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)', 
+    breaks = -3:3,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit2$zeta %>% as.double(),
+      labels = round(anx_fit2$zeta, 2)
+    )) +
+  NULL
+```
+
+
+
+```{r all-gender-normals, echo=F, fig.width = 13, fig.height = 8}
+mm_mean <- anx_fit2$coefficients[['genderMale/Man']]
+ag_mean <- anx_fit2$coefficients[['genderAnother Gender']]
+
+anx_fit2_latent_normals |>
+  ggplot(aes(x = x, y = d, fill = Gender)) +
+  geom_area(position = 'identity', alpha = 0.5) +
+  geom_vline(xintercept = anx_fit2$zeta, linetype = 'dotted', linewidth = 1) +
+  geom_vline(linewidth = 1.5, xintercept = 0, colour = palette_gender[1]) +
+  geom_vline(linewidth = 1.5, xintercept = mm_mean, colour = palette_gender[2]) +
+  geom_vline(linewidth = 1.5, xintercept = ag_mean, colour = palette_gender[3]) +
+  geom_text(data = rating_labs, aes(label = labs), family = 'Fira Sans', size = 12) +
+  scale_fill_manual(values = palette_gender) +
+  theme_classic() +
+  theme(
+    axis.line.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    text = element_text(family = 'Fira Sans', size = 24),
+    axis.text.x.top = element_text(family = 'Fira Sans', size = 24, colour = 'black'),
+    legend.position = 'bottom'
+  ) +
+  scale_y_continuous(NULL, breaks = NULL, limits = c(0, 0.6)) +
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)', 
+    breaks = -3:3,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit2$zeta %>% as.double(),
+      labels = round(anx_fit2$zeta, 2)
+    )) +
+  geom_segment(aes(x= 0, y = 0.44, xend = mm_mean, yend = 0.44), linewidth = 2, arrow = arrow(length = unit(0.5,"cm")), colour = palette_gender[2]) +
+  geom_label(aes(x = -0.33, y = 0.49), label = round(mm_mean, 2), fill = 'white', colour = palette_gender[2], family = 'Fira Sans', size = 10, label.size = 1) +
+  geom_segment(aes(x= 0, y = 0.44, xend = ag_mean, yend = 0.44), linewidth = 2, arrow = arrow(length = unit(0.5,"cm")), colour = palette_gender[3]) +
+  geom_label(aes(x = 0.48, y = 0.49), label = round(ag_mean, 2), fill = 'white', colour = palette_gender[3], family = 'Fira Sans', size = 10, label.size = 1) +
+  NULL
+```
+
+
+# The mistake and how you'll avoid it
+
+TODO delete 3
+
+| **The mistake** | **How you'll avoid it** |
+|---|---|
+| **A common R mistake:** Letting R treat all variables that look like numbers as continuous numeric. | When a variable comes from a Likert scale, tell R it’s categorical using `factor()`. |
+| **A foundational stats mistake:** Modelling categorical, ordinal data as if it were numeric. | Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`). |
+| **A foundational stats mistake:** Interpreting a significant *p*-value as evidence that an effect exists in the real world. | Understand that significant *p*-values can arise even if no effect exists in the real world. |
+
+
+# Are the effects of `gender` significant?
+
+```{r}
+summary(anx_fit2)
+```
+
+TODO prune summary to just coefs
+
+
+No *p*-values in the model summary.
+
+But it’s common practice to compare these *t*-values to a standard normal distribution.
+
+```{r anx_fit2-coef-pvals1, include=F}
+pnorm(abs(-10.880), lower.tail = FALSE) * 2
+pnorm(abs(  4.041), lower.tail = FALSE) * 2
+```
+
+```{r zscore-mm, echo=F, fig.width = 9, fig.height = 1.5}
+mm_t <- -10.88
+
+tibble(x = seq(from = -11, to = 11, length.out = 500)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0.4) +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept = mm_t) +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept = -mm_t) +
+  geom_text(
+    aes(x = -10.5, y = 0.2), 
+    colour = '#bb3725', label = 't = –10.88\np < 0.001',
+    family = "Fira Sans", size = 8,
+    hjust = 0
+    ) +
+  scale_x_continuous(
+    NULL,
+    breaks = seq(-10, 10, 5)) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.4)
+    ) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+  ) +
+  NULL
+```
+
+
+```{r zscore-ag, echo=F, fig.width = 9, fig.height = 1.5}
+ag_t <-  4.041
+
+tibble(x = seq(from = -11, to = 11, length.out = 500)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0.4) +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept =  ag_t) +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept = -ag_t) +
+  geom_text(
+    aes(x = -3.5, y = 0.2), 
+    colour = '#bb3725', label = 't = 4.041\np < 0.001',
+    family = "Fira Sans", size = 8,
+    hjust = 0
+    ) +
+  scale_x_continuous(
+    NULL,
+    breaks = seq(-10, 10, 5)) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.4)
+    ) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+  ) +
+  NULL
+```
+
+
+# Why don’t significant *p*-values mean an effect exists?
+
+Because we can also get significant *p*-values when there really is *no* effect.
+
+No difference in the true population:
+
+```{r true-skew-probdist, echo=F, fig.height = 5, fig.width = 8}
+TRUE_PROBDIST <- c(.4, .25, .15, .1, .1)
+  
+tibble(
+  group = rep(c('Group A', 'Group B'), each = 5),
+  score = rep(1:5, 2),
+  prob = rep(TRUE_PROBDIST, 2)  # skewed
+) |>
+  ggplot(aes(x = factor(score), y = prob, fill = group)) +
+  geom_bar(stat = 'identity') +
+  theme_classic() +
+  facet_wrap(~ group, nrow = 2) +
+  theme(
+    legend.position = 'none',
+    text = element_text(family = 'Fira Sans', size = 18),
+    strip.background = element_blank()
+  ) +
+  labs(
+    x = element_blank(),
+    y = 'True probability'
+  ) +
+  scale_y_continuous(
+    limits = c(0, 1),
+    breaks = c(0, 0.5, 1)
+  ) +
+  scale_fill_manual(values = palette_ab) +
+  scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\n of anxiety)')) +
+  NULL
+```
+
+A possible random sample (*n* = 50 per group):
+
+```{r simdat, echo=F, fig.height = 5, fig.width = 8}
+SAMPLE_SIZE <- 50
+set.seed(1)
+sample_a <- sample(x = 1:5, size = SAMPLE_SIZE, replace = TRUE, prob = TRUE_PROBDIST)
+
+set.seed(24)
+sample_b <- sample(x = 1:5, size = SAMPLE_SIZE, replace = TRUE, prob = TRUE_PROBDIST)
+  
+simdat <- tibble(
+  group = rep(c('Group A', 'Group B'), each = SAMPLE_SIZE),
+  rating = factor(c(sample_a, sample_b))
+)
+
+simdat |> 
+  ggplot(aes(x = rating, fill = group)) +
+  geom_bar() +
+  facet_wrap(~ group, nrow = 2) +
+  theme_classic() +
+  theme(
+    legend.position = 'none',
+    text = element_text(family = 'Fira Sans', size = 18),
+    strip.background = element_blank()
+  ) +
+  scale_fill_manual(values = palette_ab) +
+  labs(
+    y = 'Count',
+    x = element_blank(),
+    ) +
+  scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\n of anxiety)')) +
+  NULL
+```
+
+
+```{r}
+sim_fit <- polr(rating ~ group, data = simdat, method = 'probit', Hess = TRUE)
+summary(sim_fit)  
+```
+
+TODO prune summary to just coef
+
+```{r zscore-sim, echo=F, fig.width = 9, fig.height = 1.5}
+sim_t <-  -2.009
+
+tibble(x = seq(from = -4.5, to = 4.5, length.out = 500)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_ribbon(aes(x = ifelse(x >= sim_t & x <= -sim_t, x, NA), ymin = 0, ymax = d), alpha = 0.4, fill = "#2e3836") +
+  geom_ribbon(aes(x = ifelse(x < sim_t, x, NA), ymin = 0, ymax = d), alpha = 0.6, fill = "#BB3725") +
+  geom_ribbon(aes(x = ifelse(x > -sim_t, x, NA), ymin = 0, ymax = d), alpha = 0.6, fill = "#BB3725") +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept =  sim_t) +
+  geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept = -sim_t) +
+  geom_text(
+    aes(x = -4.2, y = 0.2), 
+    colour = '#bb3725', label = 't = –2.009\np < 0.05',
+    family = "Fira Sans", size = 8,
+    hjust = 0
+    ) +
+  scale_x_continuous(
+    NULL,
+    breaks = seq(-6, 6, 2)) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.4)
+    ) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+  ) +
+  NULL
+```
+
+```{r include=F}
+pnorm(abs(-2.009), lower.tail = FALSE) * 2
+```
+
+So *p* is significant, but in the true population, Group A and Group B were identical!
+
+
+# The mistake and how you'll avoid it
+
+| **The mistake** | **How you'll avoid it** |
+|---|---|
+| **A common R mistake:** Letting R treat all variables that look like numbers as continuous numeric. | When a variable comes from a Likert scale, tell R it’s categorical using `factor()`. |
+| **A foundational stats mistake:** Modelling categorical, ordinal data as if it were numeric. | Apply and interpret ordinal regression models (e.g., `polr()` from `MASS`). |
+| **A foundational stats mistake:** Interpreting a significant *p*-value as evidence that an effect exists in the real world. | Understand that significant *p*-values can arise even if no effect exists in the real world. |
+
+
+# Some really nice resources
+
+- Jamieson's (2004) paper **[Likert scales: How to (ab)use them.](https://onlinelibrary.wiley.com/doi/10.1111/j.1365-2929.2004.02012.x)**
+
+- UCLA Statistical Methods and Data Analytics's web page **[Ordinal Logistic Regression.](https://stats.oarc.ucla.edu/r/dae/ordinal-logistic-regression/)**
+
+- Kurz' (2021) blog post **[Notes on the Bayesian cumulative probit.](https://stats.oarc.ucla.edu/r/dae/ordinal-logistic-regression/)**
+
+- Vasishth and Nicenboim's (2016) paper **[Statistical Methods for Linguistic Research: Foundational Ideas – Part I.](https://doi.org/10.1111/lnc3.12201)**
+
+- Gelman and Hill's (2007) book **[Data Analysis Using Regression and Multilevel/Hierarchical Models.](https://www.cambridge.org/highereducation/books/data-analysis-using-regression-and-multilevel-hierarchical-models/32A29531C7FD730C3A68951A17C9D983)**
+
+
+# Plot on Slide 2 from
+
+Reeder, P. A., Newport, E. L., & Aslin, R. N. (2017). Distributional learning of subcategories in an artificial grammar: Category generalization and subcategory restrictions. *Journal of Memory and Language*, 97, 17–29.
+
+
+# Data from
+
+Terry, J., Ross, R. M., Nagy, T., Salgado, M., Garrido-Vásquez, P., Sarfo, J. O., Cooper, S., Buttner, A. C., Lima, T. J. S., Öztürk, İ., Akay, N., Santos, F. H., Artemenko, C., Copping, L. T., Elsherif, M. M., Milovanović, I., Cribbie, R. A., Drushlyak, M. G., Swainston, K., … Field, A. P. (2023). Data from an International Multi-Centre Study of Statistics and Mathematics Anxieties and Related Variables in University Students (the SMARVUS Dataset). *Journal of Open Psychology Data*, 11(1), 8.
+
+
+

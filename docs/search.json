@@ -4,6 +4,41 @@
     "href": "index.html",
     "title": "Teaching Demo @ UoE Psychology",
     "section": "",
-    "text": "Teaching presentation\n\nTeaching handout\n\n\nExtra analyses\n\n\nAbout the data\n\nHelpful resources"
+    "text": "This is the web site for Elizabeth Pankratz’ teaching demo at UoE Psychology on March 26, 2025.\n\n\n\n\nPresentation slides\n\nActivity handout\n\n\n\n\n\nPresentation handout\n\nDetailed analyses"
+  },
+  {
+    "objectID": "pages/demo-handout.html",
+    "href": "pages/demo-handout.html",
+    "title": "Ordinal regression analysis with polr()",
+    "section": "",
+    "text": "lorem ipsum"
+  },
+  {
+    "objectID": "pages/demo-handout.html#header",
+    "href": "pages/demo-handout.html#header",
+    "title": "Ordinal regression analysis with polr()",
+    "section": "",
+    "text": "lorem ipsum"
+  },
+  {
+    "objectID": "pages/demo-handout.html#header-1",
+    "href": "pages/demo-handout.html#header-1",
+    "title": "Ordinal regression analysis with polr()",
+    "section": "Header",
+    "text": "Header\nlorem ipsum"
+  },
+  {
+    "objectID": "index.html#elizabeth-pankratz-teaching-presentation",
+    "href": "index.html#elizabeth-pankratz-teaching-presentation",
+    "title": "Teaching Demo @ UoE Psychology",
+    "section": "",
+    "text": "Presentation slides\n\nPresentation handout\n\n\n \n\n\nActivity handout\n\nDetailed analyses"
+  },
+  {
+    "objectID": "pages/detailed-analyses.html",
+    "href": "pages/detailed-analyses.html",
+    "title": "Detailed analyses",
+    "section": "",
+    "text": "This page contains (1) an extended analysis of the anxiety data from the teaching presentation using MASS::polr().\nIt also illustrates two less good ways to analyse ordinal data: (2) just treating it as numeric and using a Gaussian model, and (3) first converting it to z-scores and then using a Gaussian model.\n\n(1) Ordinal regression with polr()\nlorem ipsum\n\n\n(2) Gaussian regression model with lm()\nlorem ipsum\n\n\n(3) z-score conversion then Gaussian regression model with lm()\nlorem ipsum"
   }
 ]

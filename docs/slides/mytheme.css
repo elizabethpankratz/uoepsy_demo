@@ -1,0 +1,54 @@
+.mono-white {
+  font-family: monospace, monospace;
+  color: 'white;';
+}
+
+/* from https://github.com/spcanelon/xaringan-basics-and-beyond/blob/main/slides/css/mytheme.css */
+
+.pull-left-narrow {
+  float: left;
+  width: 20%;
+}
+
+.pull-right-wide {
+  float: right;
+  width: 75%;
+}
+
+
+.pull-left-third {
+  float: left;
+  width: 33%;
+}
+
+.pull-right-twothird {
+  float: right;
+  width: 65%;
+}
+
+
+
+/*-- equal 3 column layout --*/
+.left-col {
+  width: 29%;
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+  float: left;
+}
+
+.center-col {
+  width: 29%;
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+  float: left;
+}
+
+.right-col {
+  width: 29%;
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+  float: left;
+}

@@ -102,10 +102,10 @@ h1, h2, h3 {
 }
 .remark-inline-code {
   font-size: var(--code-inline-font-size);
-  color: #0F4C81;
+  color: #2e3836;
 }
 .remark-slide-number {
-  color: #0F4C81;
+  color: #2e3836;
   opacity: 1;
   font-size: 0.9rem;
 }
@@ -153,10 +153,10 @@ a, a > code {
   float: left;
 }
 .left-column h2, .left-column h3 {
-  color: #0F4C8199;
+  color: #2e3836;
 }
 .left-column h2:last-of-type, .left-column h3:last-child {
-  color: #0F4C81;
+  color: #2e3836;
 }
 .right-column {
   width: 75%;

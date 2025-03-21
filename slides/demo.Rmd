@@ -17,7 +17,6 @@ output:
 
 ```{r setup, include = FALSE}
 library(tidyverse)
-# library(renderthis)
 library(MASS)
 
 # To solve some conflicts between packages
@@ -56,7 +55,7 @@ palette_ab <- c('#72190e', '#F1932D')
 
 --
 
-.center[![:scale 55%](imgs/ReederEtAl2017-JML.png)]
+.center[![:scale 55%](../imgs/ReederEtAl2017-JML.png)]
 
 --
 
@@ -69,7 +68,7 @@ palette_ab <- c('#72190e', '#F1932D')
 --
 
 .center[
-![:scale 80%](imgs/rating-scale-0.svg)
+![:scale 80%](../imgs/rating-scale-0.svg)
 ]
 
 ???
@@ -84,7 +83,7 @@ count:false
 ### Why Likert scale ratings aren’t continuous numeric
 
 .center[
-![:scale 80%](imgs/rating-scale-1.svg)
+![:scale 80%](../imgs/rating-scale-1.svg)
 ]
 
 ---
@@ -93,7 +92,7 @@ count:false
 ### Why Likert scale ratings aren’t continuous numeric
 
 .center[
-![:scale 80%](imgs/rating-scale-2.svg)
+![:scale 80%](../imgs/rating-scale-2.svg)
 ]
 
 ---
@@ -102,7 +101,7 @@ count:false
 ### Why Likert scale ratings aren’t continuous numeric
 
 .center[
-![:scale 80%](imgs/rating-scale-3.svg)
+![:scale 80%](../imgs/rating-scale-3.svg)
 ]
 
 
@@ -112,7 +111,7 @@ count:false
 ### Why Likert scale ratings aren’t continuous numeric
 
 .center[
-![:scale 80%](imgs/rating-scale-0.svg)
+![:scale 80%](../imgs/rating-scale-0.svg)
 ]
 
 --
@@ -125,7 +124,7 @@ count:false
 ### Why Likert scale ratings aren’t continuous numeric
 
 .center[
-![:scale 80%](imgs/rating-scale-4.svg)
+![:scale 80%](../imgs/rating-scale-4.svg)
 ]
 
 .center[**Numbers on a Likert scale are just labels.**]
@@ -138,7 +137,7 @@ count:false
 
 
 .center[
-![:scale 80%](imgs/rating-scale-5.svg)
+![:scale 80%](../imgs/rating-scale-5.svg)
 ]
 
 .center[**Numbers on a Likert scale are just labels.**]
@@ -467,7 +466,7 @@ anx_fit1 <- polr(
 summary(anx_fit1)
 ```
 
-![:scale 85%](imgs/anx_fit1_intercepts.svg)
+![:scale 85%](../imgs/anx_fit1_intercepts.svg)
 
 ]
 
@@ -526,7 +525,7 @@ count: false
 summary(anx_fit1)
 ```
 
-![:scale 85%](imgs/anx_fit1_intercepts.svg)
+![:scale 85%](../imgs/anx_fit1_intercepts.svg)
 
 ]
 

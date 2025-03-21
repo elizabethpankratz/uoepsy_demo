@@ -8,6 +8,7 @@ project:
     - "imgs/"
     - "slides/"
     - "data/"
+    - "pages/"
     
 
 website:
@@ -15,12 +16,14 @@ website:
   navbar:
     background: light
     left:
-      - text: Presentation
+      - text: Presentation slides
         href: slides/demo.html
-      - text: Analyses
-        href: slides/demo.html
-      - text: Data
-        href: slides/demo.html
+      - text: Presentation handout
+        href: pages/demo-handout.html
+      - text: Activity handout
+        href: pages/activity-handout.pdf
+      - text: Detailed analyses
+        href: pages/detailed-analyses.html
   page-navigation: true
 
 

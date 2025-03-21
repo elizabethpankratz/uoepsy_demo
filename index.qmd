@@ -2,31 +2,36 @@
 sidebar: false
 ---
 
+This is the web site for [Elizabeth Pankratz'](https://elizabethpankratz.github.io) teaching demo at UoE Psychology on March 26, 2025.
+
+<br>
+
 :::{.center-h}
+
 :::: {.columns}
 
-::: {.column width="20%"}
-<!-- [{{< iconify ri slideshow-line size=5x >}}<br><br>Teaching presentation](slides/demo.html) -->
-[{{< iconify mingcute presentation-1-line size=5x >}}<br><br>Teaching presentation](slides/demo.html)
+::: {.column width="30%"}
+[{{< iconify mingcute presentation-1-line size=5x >}}<br><br>Presentation slides](slides/demo.html)
 :::
 
-::: {.column width="20%"}
-[{{< iconify mingcute paper-2-line size=5x >}}<br><br>Teaching handout](slides/demo.html)
-:::
-
-::: {.column width="20%"}
-<!-- [{{< iconify mdi graph-box-multiple-outline size=5x >}}<br><br>Extra analyses](slides/demo.html) -->
-[{{< iconify mdi graph-bell-curve size=5x >}}<br><br>Extra analyses](slides/demo.html)
-:::
-
-::: {.column width="20%"}
-<!-- [{{< iconify ri survey-line size=5x >}}<br><br>About the data](slides/demo.html) -->
-[{{< iconify fluent likert-24-regular size=5x >}}<br><br>About the data](slides/demo.html)
-:::
-
-::: {.column width="20%"}
-[{{< iconify material-symbols book-5-outline-rounded size=5x >}}<br><br>Helpful resources](slides/demo.html)
+::: {.column width="30%"}
+[{{< iconify streamline collaborations-idea size=5x >}}<br><br>Activity handout](pages/activity-handout.pdf)
 :::
 
 ::::
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="30%"}
+[{{< iconify mingcute paper-2-line size=5x >}}<br><br>Presentation handout](pages/demo-handout-formatted.pdf)
+:::
+
+::: {.column width="30%"}
+[{{< iconify mdi chart-bell-curve size=5x >}}<br><br>Detailed analyses](pages/detailed-analyses.html)
+:::
+
+::::
+
 :::

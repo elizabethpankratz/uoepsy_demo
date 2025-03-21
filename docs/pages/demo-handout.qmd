@@ -1,0 +1,11 @@
+---
+title: Ordinal regression analysis with `polr()`
+---
+
+## Header
+
+lorem ipsum
+
+## Header
+
+lorem ipsum
