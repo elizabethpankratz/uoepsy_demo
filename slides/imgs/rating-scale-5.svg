@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 4100 2014" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(1,0,0,1,0,20)">
+        <g transform="matrix(1,0,0,1,10.6651,-932.969)">
+            <g transform="matrix(133.333,0,0,133.333,1452.28,1406.33)">
+            </g>
+            <text x="822.278px" y="1406.33px" style="font-family:'FiraSans-Regular', 'Fira Sans', sans-serif;font-size:133.333px;">no anxiet<tspan x="1386.68px " y="1406.33px ">y</tspan></text>
+        </g>
+        <g transform="matrix(1,0,0,1,1676.86,-936.969)">
+            <text x="866.861px" y="1406.33px" style="font-family:'FiraSans-Regular', 'Fira Sans', sans-serif;font-size:133.333px;">a gr<tspan x="1091.53px 1162.86px " y="1406.33px 1406.33px ">ea</tspan>t de<tspan x="1469.93px 1541.13px " y="1406.33px 1406.33px ">al</tspan></text>
+            <g transform="matrix(133.333,0,0,133.333,1521.79,1573)">
+            </g>
+            <text x="925.261px" y="1573px" style="font-family:'FiraSans-Regular', 'Fira Sans', sans-serif;font-size:133.333px;">of anxiet<tspan x="1456.19px " y="1573px ">y</tspan></text>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,663.465,-267.322)">
+        <circle cx="490.145" cy="1133.29" r="106.869" style="fill:none;stroke:black;stroke-width:20.83px;"/>
+    </g>
+    <g transform="matrix(1,0,0,1,1100.58,-267.322)">
+        <circle cx="490.145" cy="1133.29" r="106.869" style="fill:none;stroke:black;stroke-width:20.83px;"/>
+    </g>
+    <g transform="matrix(1,0,0,1,1537.69,-267.322)">
+        <circle cx="490.145" cy="1133.29" r="106.869" style="fill:none;stroke:black;stroke-width:20.83px;"/>
+    </g>
+    <g transform="matrix(1,0,0,1,1974.8,-267.322)">
+        <circle cx="490.145" cy="1133.29" r="106.869" style="fill:none;stroke:black;stroke-width:20.83px;"/>
+    </g>
+    <g transform="matrix(1,0,0,1,2411.91,-267.322)">
+        <circle cx="490.145" cy="1133.29" r="106.869" style="fill:none;stroke:black;stroke-width:20.83px;"/>
+    </g>
+    <g id="letters">
+        <g transform="matrix(1,0,0,1,295.532,-195.614)">
+            <g transform="matrix(200,0,0,200,936.878,1406.33)">
+            </g>
+            <text x="822.278px" y="1406.33px" style="font-family:'FiraSans-Regular', 'Fira Sans', sans-serif;font-size:200px;">A</text>
+        </g>
+        <g transform="matrix(1,0,0,1,721.444,-194.71)">
+            <g transform="matrix(200,0,0,200,943.878,1406.33)">
+            </g>
+            <text x="822.278px" y="1406.33px" style="font-family:'FiraSans-Regular', 'Fira Sans', sans-serif;font-size:200px;">B</text>
+        </g>
+        <g transform="matrix(1,0,0,1,1159.66,-195.795)">
+            <g transform="matrix(200,0,0,200,934.278,1406.33)">
+            </g>
+            <text x="822.278px" y="1406.33px" style="font-family:'FiraSans-Regular', 'Fira Sans', sans-serif;font-size:200px;">C</text>
+        </g>
+        <g transform="matrix(1,0,0,1,1588.47,-194.71)">
+            <g transform="matrix(200,0,0,200,951.078,1406.33)">
+            </g>
+            <text x="822.278px" y="1406.33px" style="font-family:'FiraSans-Regular', 'Fira Sans', sans-serif;font-size:200px;">D</text>
+        </g>
+        <g transform="matrix(1,0,0,1,2031.58,-196.7)">
+            <g transform="matrix(200,0,0,200,929.278,1406.33)">
+            </g>
+            <text x="822.278px" y="1406.33px" style="font-family:'FiraSans-Regular', 'Fira Sans', sans-serif;font-size:200px;">E</text>
+        </g>
+    </g>
+</svg>

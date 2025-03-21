@@ -17,7 +17,7 @@ output:
 
 ```{r setup, include = FALSE}
 library(tidyverse)
-library(renderthis)
+# library(renderthis)
 library(MASS)
 
 # To solve some conflicts between packages
@@ -52,44 +52,105 @@ palette_ab <- c('#72190e', '#F1932D')
 
 
 
-## Something you won't be able to unsee
+### Something you won’t be able to unsee
 
 --
 
-.pull-left[
-![](imgs/ReederEtAl2017-JML.png)
+.center[![:scale 55%](imgs/ReederEtAl2017-JML.png)]
 
-Reeder et al. (2017) in **Journal of Memory and Language.**
+--
 
-]
-
-.pull-right[
-
-![](imgs/ElazarEtAl2022-CogSci2.png)
-
-
-Elazar et al. (2022) in **Cognitive Science.**
-
-<br>
-
-![](imgs/HarriganEtAl2022-Language.png)
-
-Harrigan et al. (2022) in **Language.**
-
-]
-
-
+.center[Taking the means of discrete ratings is very common—but a little strange!]
 
 ---
 
+### Why Likert scale ratings aren’t continuous numeric
 
+--
+
+.center[
+![:scale 80%](imgs/rating-scale-0.svg)
+]
+
+???
+
+Define Likert Scale
+
+"Likert" v "Lickert"
+
+---
+count:false
+
+### Why Likert scale ratings aren’t continuous numeric
+
+.center[
+![:scale 80%](imgs/rating-scale-1.svg)
+]
+
+---
+count:false
+
+### Why Likert scale ratings aren’t continuous numeric
+
+.center[
+![:scale 80%](imgs/rating-scale-2.svg)
+]
+
+---
+count:false
+
+### Why Likert scale ratings aren’t continuous numeric
+
+.center[
+![:scale 80%](imgs/rating-scale-3.svg)
+]
+
+
+---
+count:false
+
+### Why Likert scale ratings aren’t continuous numeric
+
+.center[
+![:scale 80%](imgs/rating-scale-0.svg)
+]
+
+--
+
+.center[**Numbers on a Likert scale are just labels.**]
+
+---
+count:false
+
+### Why Likert scale ratings aren’t continuous numeric
+
+.center[
+![:scale 80%](imgs/rating-scale-4.svg)
+]
+
+.center[**Numbers on a Likert scale are just labels.**]
+
+---
+
+count:false
+
+### Why Likert scale ratings aren’t continuous numeric
+
+
+.center[
+![:scale 80%](imgs/rating-scale-5.svg)
+]
+
+.center[**Numbers on a Likert scale are just labels.**]
+
+---
 
 .pull-left[
-## The mistake
+### The mistake
 ]
 
 .pull-right[
-## How you'll avoid it
+### How you’ll avoid it
 ]
 
 --
@@ -97,7 +158,7 @@ Harrigan et al. (2022) in **Language.**
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
 **A common R mistake:**
-Letting R treat all variables that consist of numbers as continuous numeric.
+Letting R treat all variables that look like numbers as continuous numeric.
 ]
 
 .pull-right[
@@ -125,10 +186,13 @@ Interpreting a significant *p*-value as evidence that an effect exists in the re
 .pull-right[
 ]
 
+???
+
+Say that we're going thru the life cycle of data analysis, starting with data prep and ending with hypothesis testing.
 
 ---
 
-### The data: Students' anxiety ratings for "Going to ask my statistics teacher for individual help with material I am having difficulty understanding."
+### The data: Students’ anxiety ratings for “Going to ask my statistics teacher for individual help with material I am having difficulty understanding”.
 
 --
 
@@ -153,9 +217,10 @@ anx |>
   NULL
 ```
 
+
 ---
 
-### The data: Students' anxiety ratings for "Going to ask my statistics teacher for individual help with material I am having difficulty understanding."
+### The data: Students’ anxiety ratings for “Going to ask my statistics teacher for individual help with material I am having difficulty understanding”.
 
 
 .pull-left[
@@ -172,7 +237,7 @@ slice(anx, 45:50)
 
 `rating` looks like numbers, and R treats it like numbers, as `dbl`.
 
-So it's tempting to manipulate it like numbers.
+So it’s tempting to manipulate it like numbers.
 
 ```{r}
 mean(anx$rating)
@@ -182,42 +247,9 @@ mean(anx$rating)
 
 ---
 
-## Why Likert scale ratings are not continuous numeric
+### Remember: We are smarter than R is
 
-.center[
-![:scale 80%](imgs/rating-scale-0.png)
-]
-
----
-count:false
-
-## Why Likert scale ratings are not continuous numeric
-
-.center[
-![:scale 80%](imgs/rating-scale-1.png)
-]
-
----
-count:false
-
-## Why Likert scale ratings are not continuous numeric
-
-.center[
-![:scale 80%](imgs/rating-scale-2.png)
-]
-
----
-count:false
-
-## Why Likert scale ratings are not continuous numeric
-
-.center[
-![:scale 80%](imgs/rating-scale-3.png)
-]
-
----
-
-## Remember: We are smarter than R is
+--
 
 Store categorical variables as factors.
 
@@ -226,9 +258,11 @@ anx <- anx |>
   mutate(rating = factor(rating))
 ```
 
+<br>
+
 --
 
-Now it's impossible to incorrectly treat them as if they're numeric!
+Now it’s impossible to incorrectly treat them as if they're numeric!
 
 ```{r}
 mean(anx$rating)
@@ -238,17 +272,17 @@ mean(anx$rating)
 
 
 .pull-left[
-## The mistake
+### The mistake
 ]
 
 .pull-right[
-## How you'll avoid it
+### How you’ll avoid it
 ]
 
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
 **A common R mistake:**
-Letting R treat all variables that consist of numbers as numeric.
+Letting R treat all variables that look like numbers as continuous numeric.
 ]
 
 .pull-right[
@@ -277,21 +311,21 @@ Interpreting a significant *p*-value as evidence that an effect exists in the re
 count:false
 
 .pull-left[
-## The mistake
+### The mistake
 ]
 
 .pull-right[
-## How you'll avoid it
+### How you’ll avoid it
 ]
 
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
 **A common R mistake:**
-Letting R treat all variables that consist of numbers as numeric.
+Letting R treat all variables that look like numbers as continuous numeric.
 ]
 
 .pull-right[
-When you know a variable is categorical, tell R that using `factor()`.
+When a variable comes from a Likert scale, tell R it’s categorical using `factor()`.
 ]
 
 .pull-left[
@@ -315,62 +349,48 @@ Interpreting a significant *p*-value as evidence that an effect exists in the re
 
 ---
 
-## Model ordinal data with `polr()`
+### What ordinal regression models do
 
-<!-- polr = **P**roportional **O**dds **L**ogistic **R**egression -->
+```{r fit anx_fit1, include=F}
+library(MASS)
+anx_fit1 <- polr(rating ~ 1, data = anx,  Hess = TRUE, method = 'probit')
+```
 
 --
 
-```{r anx_fit1, message=F}
-library(MASS)        # MASS contains the polr() function
+```{r plot-underlying-normal-0, echo=F, fig.width = 12, fig.height = 6}
+tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0) +
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)',
+    breaks = -3:3,
+    ) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.5)
+    ) +
+  coord_cartesian(xlim = c(-3, 3)) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+    axis.line.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    axis.text.x.top = element_text(size=28, colour = 'white')
+  ) +
+  NULL
 
-anx_fit1 <- polr(
-  rating ~ 1,        # intercept-only model, to start
-  data = anx, 
-  Hess = TRUE, method = 'probit'  # ask me in the Q+A!
-)
 ```
 
 ---
+count: false
 
-##  Model ordinal data with `polr()`
-
-```{r anx_fit1-summary, message=F}
-summary(anx_fit1)
-```
-
-
-
----
-
-## What do those `Intercepts` mean?
-
---
-
-```{r echo=F}
-get_probs_btwn_thresholds <- function(zetas){
-  # zetas: a vector of thresholds (numeric) in Phi space (estimated by polr model).
-  
-  # Back-transform thresholds into probability space. Currently cumulative.
-  prob_spc_thresholds <- pnorm(zetas)  
-  
-  # Add first and last elements to this cumsum so that successive differences come out right.
-  probs_btwn_thresholds <- diff( c(`1` = 0, prob_spc_thresholds, 'x' = 1) )
-  
-  # Rename each element in the vector to the between-threshold sections.
-  names(probs_btwn_thresholds) <- 1:length(probs_btwn_thresholds)
-  
-  return(probs_btwn_thresholds)
-}
-```
-
+### What ordinal regression models do
 
 ```{r plot-underlying-normal, echo = F, fig.width = 12, fig.height = 6}
-rating_labs <- tibble(
-  x = c(-2.6, -1.4, -0.5, 0.1, 0.7, 1.5),
-  d = c(0.45),
-  labs = c('Rating:', 1:5)
-)
+
 
 p_underlying_normal <- tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) %>% 
   mutate(d = dnorm(x = x)) %>% 
@@ -378,13 +398,7 @@ p_underlying_normal <- tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) 
   geom_area(fill = '#2e3836', alpha = 0.4) +
   scale_x_continuous(
     'Anxiety (imaginary underlying variable)',
-    breaks = -3:3,
-    sec.axis = dup_axis(
-      name = NULL,
-      breaks = anx_fit1$zeta %>% as.double(),
-      labels = round(anx_fit1$zeta, 2)
-    )
-    ) +
+    breaks = -3:3) +
   scale_y_continuous(
     NULL, 
     breaks = NULL,
@@ -403,64 +417,158 @@ p_underlying_normal <- tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) 
 p_underlying_normal
 ```
 
-???
-
-- imagine that there's some underlying continuous normal distribution of anxiety, assumed standard normal [show normal distrib]
-- ppl with high anxiety are more likely to give high responses, ppl with low anxiety more likely to give low responses (could do emojis relating to anxiety: `r fontawesome::fa("face-smile-beam", height = '1em')`, `r fontawesome::fa("face-grimace", height = '1em')`)
-- so to estimate how different anxiety levels translate to different responses on the 1--5 scale, we draw thresholds on that distribution [add thresholds]
-- ppl with anxiety in this bin will respond with 1, in this bin with 2, etc.
-- and those thresholds, the cutpoints btwn ratings, are the intercepts.
-- [show intercept estimates, put thoes same numbers on the thresholds]
-- normal distribution assumption is from method = probit. other methods assume other underlying distributions, but the idea of thresholds is the same.
-
 ---
 count: false
 
-## What do those `Intercepts` mean?
+### What ordinal regression models do
 
 ```{r plot-underlying-normal2, message=F, echo = F, fig.width = 12, fig.height = 6}
+rating_labs <- tibble(
+  x = c(-2.6, -1.2, -0.5, 0.1, 0.7, 1.3),
+  d = c(0.47),
+  labs = c('Rating:', LETTERS[1:5])
+)
+
 p_underlying_normal +
   geom_vline(xintercept = anx_fit1$zeta, linetype = 'dotted', linewidth = 1) +  # thresholds
   scale_x_continuous(
     'Anxiety (imaginary underlying variable)',
     breaks = -3:3,
-    sec.axis = dup_axis(
-      name = NULL,
-      breaks = anx_fit1$zeta %>% as.double(),
-      labels = round(anx_fit1$zeta, 2)
-    )
   ) +
   geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 12) +
   theme(axis.text.x.top = element_text(size=28, colour = 'white')) +
   NULL
 ```
 
+
 ---
-count: false
 
-## What do those `Intercepts` mean?
+### Fit ordinal regression models with `polr()`
 
-```{r plot-underlying-normal3, message=F, echo = F, fig.width = 12, fig.height = 6}
-p_underlying_normal +
+--
+
+```{r anx_fit1-display, message=F, eval=F}
+library(MASS)        # MASS contains the polr() function
+
+anx_fit1 <- polr(
+  rating ~ 1,        # intercept-only model, to start
+  data = anx, 
+  Hess = TRUE, method = 'probit'  # ask me in the Q+A!
+)
+```
+
+---
+
+### Fit ordinal regression models with `polr()`
+
+.pull-left[
+
+```{r anx_fit1-ints, message=F, eval=F}
+summary(anx_fit1)
+```
+
+![:scale 85%](imgs/anx_fit1_intercepts.svg)
+
+]
+
+--
+
+.pull-right[
+
+```{r plot-underlying-normal-side1, message=F, echo = F, fig.width = 6, fig.height = 6}
+rating_labs <- tibble(
+  x = c(-1.2, -0.5, 0.1, 0.7, 1.3),
+  d = c(0.47),
+  labs = c(LETTERS[1:5])
+)
+
+tibble(x = seq(from = -2, to = 2, length.out = 200)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0.4) +
+  geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 10) +
   geom_vline(xintercept = anx_fit1$zeta, linetype = 'dotted', linewidth = 1) +  # thresholds
   scale_x_continuous(
     'Anxiety (imaginary underlying variable)',
-    breaks = -3:3,
+    breaks = -2:2,
     sec.axis = dup_axis(
       name = NULL,
       breaks = anx_fit1$zeta %>% as.double(),
       labels = round(anx_fit1$zeta, 2)
     )
   ) +
-  geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 12) +
-  theme(axis.text.x.top = element_text(size=28, colour = 'black')) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.5)
+    ) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+    axis.line.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    axis.text.x.top = element_text(size = 24, colour = 'white'),
+    axis.title.x.bottom = element_text(size = 18)
+  ) +
   NULL
 ```
 
+]
+
+---
+count: false
+
+### Fit ordinal regression models with `polr()`
+
+.pull-left[
+
+```{r anx_fit1-ints2, message=F, eval=F}
+summary(anx_fit1)
+```
+
+![:scale 85%](imgs/anx_fit1_intercepts.svg)
+
+]
+
+.pull-right[
+
+```{r plot-underlying-normal-side2, message=F, echo = F, fig.width = 6, fig.height = 6}
+tibble(x = seq(from = -2, to = 2, length.out = 200)) %>% 
+  mutate(d = dnorm(x = x)) %>% 
+  ggplot(aes(x = x, y = d)) +
+  geom_area(fill = '#2e3836', alpha = 0.4) +
+  geom_text(data = rating_labs, aes(label = labs), family = "Fira Sans", size = 10) +
+  geom_vline(xintercept = anx_fit1$zeta, linetype = 'dotted', linewidth = 1) +  # thresholds
+  scale_x_continuous(
+    'Anxiety (imaginary underlying variable)',
+    breaks = -2:2,
+    sec.axis = dup_axis(
+      name = NULL,
+      breaks = anx_fit1$zeta %>% as.double(),
+      labels = round(anx_fit1$zeta, 2)
+    )
+  ) +
+  scale_y_continuous(
+    NULL, 
+    breaks = NULL,
+    limits = c(0, 0.5)
+    ) +
+  theme_classic() +
+  theme( 
+    text = element_text(family = "Fira Sans", size = 24),
+    axis.line.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    axis.text.x.top = element_text(size = 24, colour = 'black'),
+    axis.title.x.bottom = element_text(size = 18)
+  ) +
+  NULL
+```
+
+]
+
 ---
 
-
-#### How does a student's gender affect how they respond to "Going to ask my statistics teacher for individual help with material I am having difficulty understanding"?
+#### How does a student’s gender affect ratings for “Going to ask my statistics teacher for individual help with material I am having difficulty understanding”?
 
 --
 
@@ -483,7 +591,7 @@ anx %>%
     x = element_blank(),
     y = 'Count'
   ) +
-  scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\nof anxiety)')) +
+  scale_x_discrete(labels = c('A\n(no anxiety)', 'B', 'C', 'D', 'E\n(a great deal\nof anxiety)')) +
   NULL
 ```
 ]
@@ -517,7 +625,7 @@ anx_fit2_latent_normals <- tibble(
 rating_labs <- tibble(
   x = c(-2.6, -1.4, -0.55, 0.06, 0.65, 1.5),
   d = c(0.55),
-labs = c('Rating:', 1:5),
+labs = c('Rating:', LETTERS[1:5]),
   Gender = factor(c('Female/Woman'), levels = c('Female/Woman', 'Male/Man', 'Another Gender'))
 )
 
@@ -545,6 +653,7 @@ anx_fit2_latent_normals |>
     strip.background = element_blank(),
     text = element_text(family = 'Fira Sans', size = 24),
     axis.text.x.top = element_text(family = 'Fira Sans', size = 16, colour = 'black'),
+    axis.title.x.bottom = element_text(size = 18),
     legend.position = 'none'
   ) +
   scale_y_continuous(NULL, breaks = NULL, limits = c(0, 0.6)) +
@@ -570,7 +679,7 @@ anx_fit2_latent_normals |>
 rating_labs <- tibble(
   x = c(-2.6, -1.4, -0.6, 0.1, 0.7, 1.5),
   d = c(0.57),
-  labs = c('Rating:', 1:5),
+  labs = c('Rating:', LETTERS[1:5]),
   Gender = c('Female/Woman')
 )
 
@@ -639,7 +748,7 @@ anx_fit2_latent_normals |>
       labels = round(anx_fit2$zeta, 2)
     )) +
   geom_segment(aes(x= 0, y = 0.44, xend = mm_mean, yend = 0.44), linewidth = 2, arrow = arrow(length = unit(0.5,"cm")), colour = palette_gender[2]) +
-  geom_label(aes(x = -0.33, y = 0.49), label = round(mm_mean, 2), fill = 'white', colour = palette_gender[2], family = 'Fira Sans', size = 10) +
+  geom_label(aes(x = -0.33, y = 0.49), label = round(mm_mean, 2), fill = 'white', colour = palette_gender[2], family = 'Fira Sans', size = 10, label.size = 1) +
   NULL
 ```
 
@@ -677,28 +786,28 @@ anx_fit2_latent_normals |>
       labels = round(anx_fit2$zeta, 2)
     )) +
   geom_segment(aes(x= 0, y = 0.44, xend = mm_mean, yend = 0.44), linewidth = 2, arrow = arrow(length = unit(0.5,"cm")), colour = palette_gender[2]) +
-  geom_label(aes(x = -0.33, y = 0.49), label = round(mm_mean, 2), fill = 'white', colour = palette_gender[2], family = 'Fira Sans', size = 10) +
+  geom_label(aes(x = -0.33, y = 0.49), label = round(mm_mean, 2), fill = 'white', colour = palette_gender[2], family = 'Fira Sans', size = 10, label.size = 1) +
   geom_segment(aes(x= 0, y = 0.44, xend = ag_mean, yend = 0.44), linewidth = 2, arrow = arrow(length = unit(0.5,"cm")), colour = palette_gender[3]) +
-  geom_label(aes(x = 0.48, y = 0.49), label = round(ag_mean, 2), fill = 'white', colour = palette_gender[3], family = 'Fira Sans', size = 10) +
+  geom_label(aes(x = 0.48, y = 0.49), label = round(ag_mean, 2), fill = 'white', colour = palette_gender[3], family = 'Fira Sans', size = 10, label.size = 1) +
   NULL
 ```
 
 ---
 
 .pull-left[
-## The mistake
+### The mistake
 ]
 .pull-right[
-## How you'll avoid it
+### How you’ll avoid it
 ]
 <!--  -->
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
 **A common R mistake:**
-Letting R treat all variables that consist of numbers as numeric.
+Letting R treat all variables that look like numbers as continuous numeric.
 ]
 .pull-right[
-When you know a variable is categorical, tell R that using `factor()`.
+When a variable comes from a Likert scale, tell R it’s categorical using `factor()`.
 ]
 <!--  -->
 .pull-left[
@@ -721,19 +830,19 @@ Interpreting a significant *p*-value as evidence that an effect exists in the re
 count: false
 
 .pull-left[
-## The mistake
+### The mistake
 ]
 .pull-right[
-## How you'll avoid it
+### How you’ll avoid it
 ]
 <!--  -->
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
 **A common R mistake:**
-Letting R treat all variables that consist of numbers as numeric.
+Letting R treat all variables that look like numbers as continuous numeric.
 ]
 .pull-right[
-When you know a variable is categorical, tell R that using `factor()`.
+When a variable comes from a Likert scale, tell R it’s categorical using `factor()`.
 ]
 <!--  -->
 .pull-left[
@@ -755,7 +864,7 @@ Interpreting a significant *p*-value as evidence that an effect exists in the re
 
 ---
 
-## Are the effects of `gender` significant?
+### Are the effects of `gender` significant?
 
 ```{r include=F}
 # summary(anx_fit2)
@@ -772,7 +881,7 @@ No *p*-values in the model summary.
 
 --
 
-But it's common practice to compare these *t*-values to a standard normal distribution.
+But it’s common practice to compare these *t*-values to a standard normal distribution.
 
 --
 
@@ -856,7 +965,7 @@ Since both *p*-values are below 0.05:
 
 ---
 
-### Why don't significant *p*-values mean an effect exists?
+### Why don’t significant *p*-values mean an effect exists?
 
 --
 
@@ -937,9 +1046,15 @@ simdat |>
 
 ]
 
+???
+
+Not only the case for ordinal models.
+True across the board.
+But I'll illustrate it for present purposes using an ordinal model.
+
 ---
 
-### Why don't significant *p*-values mean an effect exists?
+### Why don’t significant *p*-values mean an effect exists?
 
 ```{r eval = FALSE}
 sim_fit <- polr(rating ~ group, data = simdat, method = 'probit', Hess = TRUE)
@@ -1001,19 +1116,19 @@ So *p* is significant, but in the true population, Group A and Group B were iden
 
 
 .pull-left[
-## The mistake
+### The mistake
 ]
 .pull-right[
-## How you'll avoid it
+### How you’ll avoid it
 ]
 <!--  -->
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
 **A common R mistake:**
-Letting R treat all variables that consist of numbers as numeric.
+Letting R treat all variables that look like numbers as continuous numeric.
 ]
 .pull-right[
-When you know a variable is categorical, tell R that using `factor()`.
+When a variable comes from a Likert scale, tell R it’s categorical using `factor()`.
 ]
 <!--  -->
 .pull-left[
@@ -1037,19 +1152,19 @@ Interpreting a significant *p*-value as evidence that an effect exists in the re
 count:false
 
 .pull-left[
-## The mistake
+### The mistake
 ]
 .pull-right[
-## How you'll avoid it
+### How you’ll avoid it
 ]
 <!--  -->
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
 **A common R mistake:**
-Letting R treat all variables that consist of numbers as numeric.
+Letting R treat all variables that look like numbers as continuous numeric.
 ]
 .pull-right[
-When you know a variable is categorical, tell R that using `factor()`.
+When a variable comes from a Likert scale, tell R it’s categorical using `factor()`.
 ]
 <!--  -->
 .pull-left[
@@ -1076,7 +1191,7 @@ Understand that significant *p*-values can arise even if no effect exists in the
 rating_labs <- tibble(
   x = c(-2.6, -1.4, -0.65, 0, 0.65, 1.4),
   d = c(0.45),
-  labs = c('Rating:', 1:5)
+  labs = c('Rating:', LETTERS[1:5])
 )
 
 tibble(x = seq(from = -4.5, to = 4.5, length.out = 200)) %>% 
@@ -1150,19 +1265,19 @@ tibble(x = seq(from = -3, to = 3, length.out = 200)) %>%
 ---
 
 .pull-left[
-## The mistake
+### The mistake
 ]
 .pull-right[
-## How you'll avoid it
+### How you’ll avoid it
 ]
 <!--  -->
 .pull-left[
 `r fontawesome::fa("code", height = '1em', margin_right = '0.2em')`
 **A common R mistake:**
-Letting R treat all variables that consist of numbers as numeric.
+Letting R treat all variables that look like numbers as continuous numeric.
 ]
 .pull-right[
-When you know a variable is categorical, tell R that using `factor()`.
+When a variable comes from a Likert scale, tell R it’s categorical using `factor()`.
 ]
 <!--  -->
 .pull-left[
@@ -1184,27 +1299,14 @@ Understand that significant *p*-values can arise even if no effect exists in the
 ]
 
 --
+<br>
 
 .center[**Thank you! `r fontawesome::fa("face-smile-beam", height = '1em', margin_left = '0.2em', margin_right = '0.2em')` Time for questions!**]
 
 ---
 count: false
 
-## References
-
-Elazar, A., Alhama, R. G., Bogaerts, L., Siegelman, N., Baus, C., & Frost, R. (2022). When the "tabula" is anything but "rasa": What determines performance in the auditory statistical learning task? *Cognitive Science*, 46(2), e13102.
-
-Harrigan, K., Hogoboom, A., & Cochrane, L. (2022). Furthering student engagement: Lab sections in introductory linguistics. *Language*, 98(4), e199–e223.
-
-Reeder, P. A., Newport, E. L., & Aslin, R. N. (2017). Distributional learning of subcategories in an artificial grammar: Category generalization and subcategory restrictions. *Journal of Memory and Language*, 97, 17–29.
-
-Terry, J., Ross, R. M., Nagy, T., Salgado, M., Garrido-Vásquez, P., Sarfo, J. O., Cooper, S., Buttner, A. C., Lima, T. J. S., Öztürk, İ., Akay, N., Santos, F. H., Artemenko, C., Copping, L. T., Elsherif, M. M., Milovanović, I., Cribbie, R. A., Drushlyak, M. G., Swainston, K., … Field, A. P. (2023). Data from an International Multi-Centre Study of Statistics and Mathematics Anxieties and Related Variables in University Students (the SMARVUS Dataset). *Journal of Open Psychology Data*, 11(1), 8.
-
-
----
-count: false
-
-## Some really nice resources
+### Some really nice resources
 
 - Jamieson's (2004) paper **[Likert scales: How to (ab)use them.](https://onlinelibrary.wiley.com/doi/10.1111/j.1365-2929.2004.02012.x)**
 
@@ -1215,3 +1317,16 @@ count: false
 - Vasishth and Nicenboim's (2016) paper **[Statistical Methods for Linguistic Research: Foundational Ideas – Part I.](https://doi.org/10.1111/lnc3.12201)**
 
 - Gelman and Hill's (2007) book **[Data Analysis Using Regression and Multilevel/Hierarchical Models.](https://www.cambridge.org/highereducation/books/data-analysis-using-regression-and-multilevel-hierarchical-models/32A29531C7FD730C3A68951A17C9D983)**
+
+
+---
+count: false
+
+### Plot on Slide 2 from
+
+Reeder, P. A., Newport, E. L., & Aslin, R. N. (2017). Distributional learning of subcategories in an artificial grammar: Category generalization and subcategory restrictions. *Journal of Memory and Language*, 97, 17–29.
+
+
+### Data from
+
+Terry, J., Ross, R. M., Nagy, T., Salgado, M., Garrido-Vásquez, P., Sarfo, J. O., Cooper, S., Buttner, A. C., Lima, T. J. S., Öztürk, İ., Akay, N., Santos, F. H., Artemenko, C., Copping, L. T., Elsherif, M. M., Milovanović, I., Cribbie, R. A., Drushlyak, M. G., Swainston, K., … Field, A. P. (2023). Data from an International Multi-Centre Study of Statistics and Mathematics Anxieties and Related Variables in University Students (the SMARVUS Dataset). *Journal of Open Psychology Data*, 11(1), 8.
