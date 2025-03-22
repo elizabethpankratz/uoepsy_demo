@@ -353,6 +353,19 @@ Interpreting a significant *p*-value as evidence that an effect exists in the re
 
 ```{r fit anx_fit1, include=F}
 library(MASS)
+
+anx <- anx |>
+  mutate(
+    rating = case_when(
+      rating == 1 ~ 'A',
+      rating == 2 ~ 'B',
+      rating == 3 ~ 'C',
+      rating == 4 ~ 'D',
+      rating == 5 ~ 'E',
+    ),
+    rating = factor(rating)
+  )
+
 anx_fit1 <- polr(rating ~ 1, data = anx,  Hess = TRUE, method = 'probit')
 ```
 
@@ -933,7 +946,7 @@ tibble(x = seq(from = -11, to = 11, length.out = 500)) %>%
   geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept =  ag_t) +
   geom_vline(colour = '#BB3725', linewidth = 1.5, xintercept = -ag_t) +
   geom_text(
-    aes(x = -3.5, y = 0.2), 
+    aes(x = -10.5, y = 0.2), 
     colour = '#bb3725', label = 't = 4.041\np < 0.001',
     family = "Fira Sans", size = 8,
     hjust = 0
@@ -1002,7 +1015,7 @@ tibble(
     breaks = c(0, 0.5, 1)
   ) +
   scale_fill_manual(values = palette_ab) +
-  scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\n of anxiety)')) +
+  scale_x_discrete(labels = c('A\n(no anxiety)', 'B', 'C', 'D', 'E\n(a great deal\n of anxiety)')) +
   NULL
 ```
 ]
@@ -1040,7 +1053,7 @@ simdat |>
     y = 'Count',
     x = element_blank(),
     ) +
-  scale_x_discrete(labels = c('1\n(no anxiety)', '2', '3', '4', '5\n(a great deal\n of anxiety)')) +
+  scale_x_discrete(labels = c('A\n(no anxiety)', 'B', 'C', 'D', 'E\n(a great deal\n of anxiety)')) +
   NULL
 ```
 
