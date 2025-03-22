@@ -7,6 +7,7 @@ output: word_document
 
 ```{r setup, include = FALSE}
 library(tidyverse)
+library(patchwork)
 library(MASS)
 
 # To solve some conflicts between packages
@@ -291,7 +292,7 @@ q_labs <- tibble(
   Gender = factor(c('Male/Man', 'Another Gender'), levels = c('Female/Woman', 'Male/Man', 'Another Gender'))
 )
 
-anx_fit2_latent_normals |>
+p_normals <- anx_fit2_latent_normals |>
   ggplot(aes(x = x, y = d, fill = Gender)) +
   facet_wrap(~ Gender, nrow=3, scale = 'free') +
   geom_area(position = 'identity', alpha = 0.5) +
@@ -321,6 +322,11 @@ anx_fit2_latent_normals |>
       labels = round(anx_fit2$zeta, 2)
     )) +
   NULL
+```
+
+```{r patchworked}
+
+
 ```
 
 
