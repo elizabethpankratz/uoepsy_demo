@@ -17,6 +17,7 @@ output:
 
 ```{r setup, include = FALSE}
 library(tidyverse)
+library(renderthis)
 library(MASS)
 
 # To solve some conflicts between packages
