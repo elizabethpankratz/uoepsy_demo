@@ -18,10 +18,10 @@ website:
     left:
       - text: Presentation slides
         href: slides/demo.html
-      - text: Presentation handout
-        href: pages/demo-handout.html
       - text: Activity handout
         href: pages/activity-handout.pdf
+      - text: Presentation handout
+        href: pages/demo-handout-formatted.pdf
       - text: Detailed analyses
         href: pages/detailed-analyses.html
   page-navigation: true
