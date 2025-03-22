@@ -47,13 +47,11 @@ I also (very) briefly illustrate two other widespread ways of analysing ordinal 
 
 The student anxiety rating data comes from [the SMARVUS dataset](https://openpsychologydata.metajnl.com/articles/10.5334/jopd.80) compiled by Terry et al. (2023).^[Terry, J., Ross, R. M., Nagy, T., Salgado, M., Garrido-Vásquez, P., Sarfo, J. O., Cooper, S., Buttner, A. C., Lima, T. J. S., Öztürk, İ., Akay, N., Santos, F. H., Artemenko, C., Copping, L. T., Elsherif, M. M., Milovanović, I., Cribbie, R. A., Drushlyak, M. G., Swainston, K., … Field, A. P. (2023). [Data from an International Multi-Centre Study of Statistics and Mathematics Anxieties and Related Variables in University Students (the SMARVUS Dataset).](https://openpsychologydata.metajnl.com/articles/10.5334/jopd.80) *Journal of Open Psychology Data*, 11(1), 8.]
 
-I first filtered the data to keep only participants who responded correctly to all seven attention checks in the original survey.
-
 For this analysis, I'm using responses to question `Q7.1_3`, which asked students to rate their anxiety from 1 (no anxiety) to 5 (a great deal of anxiety) in response to the following scenario: **"Going to ask my statistics teacher for individual help with material I am having difficulty understanding".**
 
 I only analysed responses from participants who passed all seven attention checks in the original survey, and I extracted each participant's unique ID, their self-reported gender (grouped by the researchers into `Female/Woman`, `Male/Man`, and `Another Gender`), and their rating for question `Q7.1_3`.
 
-This data is saved in `anx.csv`.
+This information is saved in `anx.csv`.
 
 ```{r}
 anx <- read_csv('data/anx.csv') |>
@@ -70,7 +68,7 @@ slice(anx, 45:50)
 
 ### Look at the data
 
-Here's how participant responses, aggregated over `gender`, pattern:
+Here's the pattern of participant responses overall to the scenario "Going to ask my statistics teacher for individual help with material I am having difficulty understanding".
 
 ```{r}
 anx |>
@@ -89,7 +87,7 @@ anx |>
 ### Fit the model
 
 To use `polr()`, the outcome variable must be a factor.
-No need to manually specify the order of levels, since they're already in the correct order by default.
+There's no need to manually specify the order of levels, since they're already in the correct order by default.^[In the teaching presentation materials, I replaced 1–5 with A–E, but for the present analyses, I'll leave the original digits as labels for each rating level.]
 
 ```{r}
 anx <- anx |>
@@ -105,24 +103,26 @@ anx_fit1 <- polr(
 summary(anx_fit1)
 ```
 
+
 ### Interpret the model
 
 The values estimated for the `Intercepts` aren't really intercepts, not like the intercept of a linear model.
-Rather, these values represent the thresholds (also called cutpoints) along a continuous latent variable, a construct which the model assumes to represent some continuous measure of anxiety.
-Sometimes this assumed continuous latent variable will be represented as $\Phi$ (phi), and sometimes those thresholds will be represented as $\zeta$ (zeta).
+Rather, these values represent the thresholds (also called cutpoints) along a continuous latent variable.
+This latent variable is a construct which the model assumes to represent some continuous measure of anxiety.
+Sometimes you'll see this assumed latent variable represented as $\Phi$ (phi), and sometimes those thresholds will be represented as $\zeta$ (zeta).
 
-We can extract those threshold values as follows:
+We can extract the threshold values as follows:
 
 ```{r}
 anx_fit1$zeta
 ```
 
 
-Because I've used the probit link function (in `method = "probit"`), the model further assumes that anxiety follows a standard normal distribution over this continuous latent variable.^[
+Because I've used the probit link (by specifying `method = "probit"`), the model further assumes that anxiety follows a standard normal distribution over this continuous latent variable.^[
 If I had used `method = "logit"`, then the model would assume not a normal distribution but a logistic distribution.
-Similar shape, but different scale, so (back-)transformation between the model space and probability space would happen not with `pnorm()`/`qnorm()` but with `plogis()`/`qlogis()`.
+Similar shape, but different scale, so (back)transformation between the model space and probability space would happen not with `pnorm()`/`qnorm()` but with `plogis()`/`qlogis()`.
 ]
-
+A standard normal distribution is a normal distribution with mean 0 and standard deviation 1.
 
 ```{r}
 rating_labs1 <- tibble(
@@ -160,8 +160,9 @@ p_underlying_normal <- tibble(x = seq(from = -3.5, to = 3.5, length.out = 200)) 
 p_underlying_normal
 ```
 
-This normal distribution allows us to compute the probability density within each region defined by the cutpoints.
-One way to do this is using `pnorm()`, which gives us by default how much probability density falls to the left of the given value in a standard normal distribution.
+Having defined this normal distribution allows us to compute the probability density within each region delineated by the thresholds.
+One way to do this is using `pnorm()`.
+The default usage of `pnorm()` tells us, for a standard normal distribution, how much probability density falls to the left of the given value.
 For the intermediate regions, we subtract the probability density below the region's leftward periphery from the probability density below its rightward periphery, to get only the density between those two bounds.
 
 ```{r}
@@ -171,7 +172,9 @@ For the intermediate regions, we subtract the probability density below the regi
 (anx_fit1_p4 <- pnorm(1.03) - pnorm(0.38))     # probability of rating 4
 (anx_fit1_p5 <- pnorm(1000) - pnorm(1.03))     # probability of rating 5
 ```
-(For rating 5, I just grabbed some huge value as an arbitrary upper bound.)
+
+(For rating 5, I just grabbed some huge value as an arbitrary upper bound.
+The outcome is essentially the same for upper bounds of 10, 100, 1000...)
 
 A good sense check: these probabilities approximate the overall proportion of responses to each rating in the original data.
 
@@ -201,14 +204,15 @@ p_underlying_normal +
 
 ### Look at the data
 
-I'll first convert `gender` to a factor with a custom ordering.
+I first converted `gender` to a factor.
+I set `Female/Woman` as the first level (important for the treatment coding I'll use below), followed by `Male/Man` and `Another Gender`.
 
 ```{r}
 anx <- anx |>
   mutate(gender = factor(gender, levels = c('Female/Woman', 'Male/Man', 'Another Gender')))
 ```
 
-Participants' anxiety ratings for the same question as above, now divided by their gender:
+Here are participants' anxiety ratings for the same question as above, now divided by their gender:
 
 ```{r, fig.height=6}
 anx |>
@@ -230,13 +234,15 @@ anx |>
 
 ### Fit the model
 
-I'm going to use R's default treatment coding for `gender`.
+I used R's default treatment coding for `gender`.
 Because of the level ordering I specified above for `gender`, `Female/Woman` will be the reference level, and we'll get two dummy variables: one comparing `Female/Woman` to `Male/Man`, and one comparing `Female/Woman` to `Another Gender`.
-To confirm:
+To confirm, here's the contrast matrix:
 
 ```{r}
 contrasts(anx$gender)
 ```
+
+Fit the model:
 
 ```{r}
 anx_fit2 <- polr(
@@ -249,20 +255,23 @@ anx_fit2 <- polr(
 summary(anx_fit2)
 ```
 
+
 ### Interpret the model
 
 Just as the `Intercepts` aren't the intercept of a line, the `Coefficients` are not the slope of a line.
 Rather, they give the mean of the normal distribution that represents how each gender group's ratings are distributed over the continuous latent variable representing anxiety.
 
-In other words, the normal distribution representing `Male/Man` anxiety is shifted leftward by 0.33 units from the reference distribution (`Female/Woman`, still centered at 0), while the `Another Gender` distribution is shifted rightward by 0.48 units.
+In other words, the `Female/Woman` group is represented by a normal distribution with mean 0 and standard deviation 1, because `Female/Woman` is the reference level.
+The normal distribution representing `Male/Man` anxiety is shifted leftward, in a negative direction, by 0.33 units from the `Female/Woman` distribution.
+The `Another Gender` distribution is shifted rightward, in a positive direction, by 0.48 units.
 
 ```{r}
 round(coef(anx_fit2), 2)
 ```
 
 
-The following code computes the probability density at each value of this latent continuous variable for each gender group's distribution.
-I'll use it to plot all three groups' probability distributions below.
+With the following code, I compute each group's normal distribution so that I can plot it.
+Concretely, I compute the probability density at each value of this latent continuous variable, adjusted for each gender group's estimated mean.
 
 ```{r}
 anx_fit2_latent_normals <- tibble(
@@ -327,10 +336,11 @@ anx_fit2_latent_normals |>
 ```
 
 
-Shifting the normal distributions left and right changes how much probability density is allocated to each region, each rating.
 The thresholds do not move.
+But shifting the normal distributions left and right changes how much probability density is allocated to each region, each rating.
 
-The following function estimates the probability density between given thresholds for a normal distribution with given mean and standard deviation (in these models, I've allowed the standard deviation to stay fixed at 1).
+I wrote the following function to compute the probability density between given thresholds for a normal distribution with given mean and standard deviation. 
+(In these simple models, I've kept the standard deviations always fixed at 1, but in principle, the standard deviation is also a parameter that can be fit to the data.)
 
 ```{r}
 get_prob_dens <- function(zetas, mu, sigma){
@@ -353,7 +363,8 @@ get_prob_dens <- function(zetas, mu, sigma){
 }
 ```
 
-Another way of visualising each resulting probability distributions is as follows.
+
+Here's one way to represent each group's probability distribution individually, including those between-threshold probabilities.
 
 ```{r}
 fw_probs <- get_prob_dens(anx_fit2$zeta, 0, 1)
@@ -460,6 +471,7 @@ anx_fit2_latent_normals |>
   NULL
 ```
 
+
 ### Significance tests
 
 `polr()` doesn't provide *p*-values:
@@ -468,10 +480,11 @@ anx_fit2_latent_normals |>
 summary(anx_fit2)
 ```
 
-But we do have *t*-values.
-So to know whether we can reject the null hypothesis (H0) that there's no association between ratings and gender, we can just treat the estimated *t*-values like z-scores and compare them to a standard normal distribution representing the H0.^[
-Ideally we'd be comparing *t*-values to a *t* distribution, but with increasing degrees of freedom, the *t* distribution better approximates the normal distribution.
-And I'm not too worried about having too few degrees of freedom for a decent approximation, because `anx` contains a lot of observations.
+But it does give us *t*-values.
+So to know whether we can reject the null hypothesis (H0) that there's no association between `rating` and `gender`, we can just treat the estimated *t*-values like z-scores and compare them to a standard normal distribution representing the H0.^[
+Ideally we'd be comparing *t*-values to a *t* distribution.
+But the *t* distribution approximates the normal distribution increasingly well with increasing degrees of freedom, and degrees of freedom increase with larger sample sizes.
+And we've got a lot of data in this analysis, so I'm not too worried about poorly approximating the H0 distribution.
 ]
 
 ```{r}
@@ -479,7 +492,7 @@ pnorm(abs(-10.880), lower.tail = FALSE) * 2
 pnorm(abs(4.041), lower.tail = FALSE) * 2
 ```
 
-In both cases, the probability of observing a value this extreme or more extreme, given the H0 of no effect given by the standard normal distribution, is less than 0.05.
+For both parameters, the probability of observing a value that extreme or more extreme, given the H0 of no effect defined by the standard normal distribution, is less than 0.05.
 So we can reject the null hypotheses that
 
 - there's no difference between `Female/Woman` and `Male/Man` ratings, and
@@ -488,7 +501,7 @@ So we can reject the null hypotheses that
 
 # Gaussian regression model with `lm()`
 
-The most common (but least adequate?) way of analysing rating data is to treat it as numeric and use a Gaussian model like `lm()`.
+The most common way of analysing rating data is to just treat it as numeric and use a Gaussian model like `lm()`.
 
 ```{r}
 anx <- anx |>
@@ -515,6 +528,7 @@ p_rating_num <- anx |>
 p_rating_num
 ```
 
+
 But nevertheless, the model is fit:
 
 ```{r}
@@ -523,13 +537,15 @@ anx_lm <- lm(rating_num ~ gender, data = anx)
 summary(anx_lm)
 ```
 
-Interpretation:
+**Interpretation:**
 
 - The `(Intercept)` represents the mean of the ratings for the reference level, `Female/Woman`.
 - The parameter `genderMale/Man` gives the difference between the mean of the ratings for `Female/Woman` and the mean of the ratings for `Male/Man`.
 - The parameter `genderAnother Gender` gives the difference between the mean of the ratings for `Female/Woman` and the mean of the ratings for `Another Gender`.
 
 Here's a visualisation of what those parameters are doing, superimposed on the plot from above.
+(To be clear, these lines do not a good/publishable visualisation make.
+But they do illustrate most clearly what the model is actually estimating.)
 
 ```{r}
 p_rating_num +
@@ -552,7 +568,6 @@ p_rating_num +
   NULL
 ```
 
-Weird stuff!
 
 
 # z-score conversion then Gaussian regression model with `lm()`
@@ -628,13 +643,13 @@ anx_z_lm <- lm(by_ppt_z ~ gender, data = anx_z)
 summary(anx_z_lm)
 ```
 
-Interpretation:
+**Interpretation:**
 
 - The `(Intercept)` represents the mean of the z-scores for the reference level, `Female/Woman`.
 - The parameter `genderMale/Man` gives the difference between the mean of the z-scores for `Female/Woman` and the mean of the z-scores for `Male/Man`.
 - The parameter `genderAnother Gender` gives the difference between the mean of the z-scores for `Female/Woman` and the mean of the z-scores for `Another Gender`.
 
-Overlay the estimated lines on the plot from above:
+Overlaying the estimated lines on the plot from above:
 
 ```{r}
 p_rating_z +
